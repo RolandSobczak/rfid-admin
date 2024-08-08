@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-config
+  namespace: rfid-main
+data:
+  # SETTINGS
+  SETTINGS_PATH: external.settings.base.Settings
+
+  # SECRET
+  PUBLIC_KEY: |
+    -----BEGIN PUBLIC KEY-----
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArNR+B9ahtbsYerULcvqz
+    DOW1uzIkazUsr6oM03z5E/yEoxbLj/Wq9fUa64sPreeQ0HebBOOL5bD5zBbvh+GS
+    qdsbLg6XRdMTIlo+qQFXUavOPHDvnVJvh3H8vKlYeEBA5Lw8Z7z5+Ph0lFmue6yh
+    vxlry6LBJB3uabo0Ds1hc62hhdAnCZqu8kDfD9LnA/433wdf03Sgt/kjoXJ9fgUt
+    LcYumEeVdv7AJXR7U0p46CQwdTL82w9dBVWfVmcsAcvae9hr6ENxVzRVyx+HV8Jk
+    8LXL9Yh4N+H/HviRGOdBWfSQmlzh/FArG2izqEi4h6MnmctD0v7I1YAwtvoT8DCy
+    5ri4Dy3Uz9n15eJ6DmEKE304zXPDQ2WaH2AlXxidl9Kichsrp4JsaAJLHOafyYPE
+    c+1iRT+Sb2yNUsQDBJ6F5IkLzuewdHeVbWyuCoGxUZnQMGKfAUkNBEEnZiNzYPka
+    Pwf+rHEecPoq51l8j9icF+t5IdxQNlXun4xuj4QwPl4MLJeVY1JtEGahspiEU1h4
+    dQN1CLlBEmObZDoJuwzHKOK1aW/WLR/sRSHIf6KozcsmDG0kQtNfqgykDm0n9Vu9
+    rc5b09aaBUO947BEK7tBS9xflC92NXclE7rIzgxv1rcWbC9udFUNYWgVZtLZbP1O
+    JdshyHNA7X84mhM09YiKnU8CAwEAAQ==
+    -----END PUBLIC KEY-----
+  AUTH_API_HOST: http://auth:8000
+  TENANT_API_HOST_TEMPLATE: "http://tenant:8000/"
+  ENV_TYPE: dev
+  LOG_LEVEL: INFO
+  ALLOWED_ORIGINS: "*"
+  ALLOW_CREDENTIALS: "True"
+  ALLOWED_METHODS: "*"
+  ALLOWED_HEADERS: "*"
+  ROOT_PATH: /external-api
+  RABBIT_HOST: mq
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: external
+  name: external
+  namespace: rfid-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: external
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: external
+    spec:
+      containers:
+        - image: localhost:32000/rfidio-external:latest
+          imagePullPolicy: Always
+          name: external
+          resources: {}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: RABBIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_PASS
+          envFrom:
+            - configMapRef:
+                name: external-config
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: external
+  name: external
+  namespace: rfid-main
+spec:
+  ports:
+    - port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app: external
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: external-ingress
+  namespace: rfid-main
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /external-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: external
+                port:
+                  number: 8000
