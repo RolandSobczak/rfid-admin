@@ -10,18 +10,18 @@ data:
   # SECRET
   PUBLIC_KEY: |
     -----BEGIN PUBLIC KEY-----
-    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArNR+B9ahtbsYerULcvqz
-    DOW1uzIkazUsr6oM03z5E/yEoxbLj/Wq9fUa64sPreeQ0HebBOOL5bD5zBbvh+GS
-    qdsbLg6XRdMTIlo+qQFXUavOPHDvnVJvh3H8vKlYeEBA5Lw8Z7z5+Ph0lFmue6yh
-    vxlry6LBJB3uabo0Ds1hc62hhdAnCZqu8kDfD9LnA/433wdf03Sgt/kjoXJ9fgUt
-    LcYumEeVdv7AJXR7U0p46CQwdTL82w9dBVWfVmcsAcvae9hr6ENxVzRVyx+HV8Jk
-    8LXL9Yh4N+H/HviRGOdBWfSQmlzh/FArG2izqEi4h6MnmctD0v7I1YAwtvoT8DCy
-    5ri4Dy3Uz9n15eJ6DmEKE304zXPDQ2WaH2AlXxidl9Kichsrp4JsaAJLHOafyYPE
-    c+1iRT+Sb2yNUsQDBJ6F5IkLzuewdHeVbWyuCoGxUZnQMGKfAUkNBEEnZiNzYPka
-    Pwf+rHEecPoq51l8j9icF+t5IdxQNlXun4xuj4QwPl4MLJeVY1JtEGahspiEU1h4
-    dQN1CLlBEmObZDoJuwzHKOK1aW/WLR/sRSHIf6KozcsmDG0kQtNfqgykDm0n9Vu9
-    rc5b09aaBUO947BEK7tBS9xflC92NXclE7rIzgxv1rcWbC9udFUNYWgVZtLZbP1O
-    JdshyHNA7X84mhM09YiKnU8CAwEAAQ==
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA41Z9WXaplX+o5Szxf2pV
+    2o7/dXDNwFoM7LJAdNno1pYYZUtph/5ickj3Pv6/MHmDIAg3bDmgKZyNC+mER7uz
+    +J0jakNkKSjEbpNcDxq1WHBYBoGRZD2JNVpnTMimgCPpyl5tESFHHi1ro6Yw2F3G
+    w2FWqK0EEoZLueGsSqizK1aIJM8ChJHoIcG5SZLy/QCBE1jlxUGkW4Ndho87TGWk
+    JHXx+iP2+Y0bBHkBjE8WkhZovRxtbv3nO5kL6eTgzyRlsZ7VttKkng7XGmwQr5aw
+    ZRE9L5HIvn5mznImBfS2SvTFaygs2E09SmbOAniQdqbxLgozBhaoeqXWyQgDmjX9
+    xOlxbW7vHqOniGLXtSLeKY10brA6wMe4tq7v+x311a/IMKZpjuk6DwG4QnLFQnDc
+    6WXZRwAZtSsheXpo5gykKGE+D1SA4P5enyMQLy2P65h+8PhhFdtEJFVt8go9LWf1
+    mAQxZfSFdWXV+k4S2f8nwZifSjTCZGTocbHU6pPrnb8bphbK0HsVjSyFXL8EmkKm
+    O8J8uPhWf1THpMv1gWUz1Fs0IJeKOde65yg6227o8wRrNaCTwOt476HLS4WEVpAU
+    J3q8VzXSPIoQ4k0vDW6kkJuNtxr1tjX2rtBJjqFOFGGh3QcNuEPaZ0KNdvNCEzz7
+    AGLRfWE6vgyE05eV7ie874ECAwEAAQ==
     -----END PUBLIC KEY-----
 
   # TENANT
@@ -52,9 +52,7 @@ data:
   # PATH
   ROOT_PATH: /tenant-api
 
-  RABBIT_HOST: rabbit
-  RABBIT_USERNAME: rfidio
-  RABBIT_PASSWORD: rfidio
+  RABBIT_HOST: mq
 
   # EXTERNAL
   NOTYFICATION_ATTEMPTS: "1,3"
@@ -97,6 +95,16 @@ spec:
                 secretKeyRef:
                   name: db
                   key: POSTGRES_PASSWORD
+            - name: RABBIT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_PASS
           envFrom:
             - configMapRef:
                 name: tenant-config

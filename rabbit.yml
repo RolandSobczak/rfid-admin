@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: rabbit
+  name: rabbit
+  namespace: rfid-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbit
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: rabbit
+    spec:
+      containers:
+        - image: rabbitmq:3.13.6-management
+          name: rabbit
+          resources: {}
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_PASS
+          ports:
+            - containerPort: 5432
+            - containerPort: 15672
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: rabbit
+  name: mq
+  namespace: rfid-main
+spec:
+  ports:
+    - port: 5672
+      protocol: TCP
+      targetPort: 5672
+  selector:
+    app: rabbit
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: rabbit
+  name: mq-management
+  namespace: rfid-main
+spec:
+  ports:
+    - port:
+      protocol: TCP
+      targetPort: 15672
+  selector:
+    app: rabbit
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabbit-ingress
+  namespace: rfid-main
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /rabbit-admin(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mq-management
+                port:
+                  number: 8000

@@ -7,52 +7,72 @@ data:
   SETTINGS_PATH: "auth.settings.base.Settings"
   PUBLIC_KEY: |
     -----BEGIN PUBLIC KEY-----
-    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArNR+B9ahtbsYerULcvqz
-    DOW1uzIkazUsr6oM03z5E/yEoxbLj/Wq9fUa64sPreeQ0HebBOOL5bD5zBbvh+GS
-    qdsbLg6XRdMTIlo+qQFXUavOPHDvnVJvh3H8vKlYeEBA5Lw8Z7z5+Ph0lFmue6yh
-    vxlry6LBJB3uabo0Ds1hc62hhdAnCZqu8kDfD9LnA/433wdf03Sgt/kjoXJ9fgUt
-    LcYumEeVdv7AJXR7U0p46CQwdTL82w9dBVWfVmcsAcvae9hr6ENxVzRVyx+HV8Jk
-    8LXL9Yh4N+H/HviRGOdBWfSQmlzh/FArG2izqEi4h6MnmctD0v7I1YAwtvoT8DCy
-    5ri4Dy3Uz9n15eJ6DmEKE304zXPDQ2WaH2AlXxidl9Kichsrp4JsaAJLHOafyYPE
-    c+1iRT+Sb2yNUsQDBJ6F5IkLzuewdHeVbWyuCoGxUZnQMGKfAUkNBEEnZiNzYPka
-    Pwf+rHEecPoq51l8j9icF+t5IdxQNlXun4xuj4QwPl4MLJeVY1JtEGahspiEU1h4
-    dQN1CLlBEmObZDoJuwzHKOK1aW/WLR/sRSHIf6KozcsmDG0kQtNfqgykDm0n9Vu9
-    rc5b09aaBUO947BEK7tBS9xflC92NXclE7rIzgxv1rcWbC9udFUNYWgVZtLZbP1O
-    JdshyHNA7X84mhM09YiKnU8CAwEAAQ==
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA41Z9WXaplX+o5Szxf2pV
+    2o7/dXDNwFoM7LJAdNno1pYYZUtph/5ickj3Pv6/MHmDIAg3bDmgKZyNC+mER7uz
+    +J0jakNkKSjEbpNcDxq1WHBYBoGRZD2JNVpnTMimgCPpyl5tESFHHi1ro6Yw2F3G
+    w2FWqK0EEoZLueGsSqizK1aIJM8ChJHoIcG5SZLy/QCBE1jlxUGkW4Ndho87TGWk
+    JHXx+iP2+Y0bBHkBjE8WkhZovRxtbv3nO5kL6eTgzyRlsZ7VttKkng7XGmwQr5aw
+    ZRE9L5HIvn5mznImBfS2SvTFaygs2E09SmbOAniQdqbxLgozBhaoeqXWyQgDmjX9
+    xOlxbW7vHqOniGLXtSLeKY10brA6wMe4tq7v+x311a/IMKZpjuk6DwG4QnLFQnDc
+    6WXZRwAZtSsheXpo5gykKGE+D1SA4P5enyMQLy2P65h+8PhhFdtEJFVt8go9LWf1
+    mAQxZfSFdWXV+k4S2f8nwZifSjTCZGTocbHU6pPrnb8bphbK0HsVjSyFXL8EmkKm
+    O8J8uPhWf1THpMv1gWUz1Fs0IJeKOde65yg6227o8wRrNaCTwOt476HLS4WEVpAU
+    J3q8VzXSPIoQ4k0vDW6kkJuNtxr1tjX2rtBJjqFOFGGh3QcNuEPaZ0KNdvNCEzz7
+    AGLRfWE6vgyE05eV7ie874ECAwEAAQ==
     -----END PUBLIC KEY-----
   PRIVATE_KEY: |
-    -----BEGIN RSA PRIVATE KEY-----
-    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
-    j1WpI8DbXWj3grrs
-
+    -----BEGIN PRIVATE KEY-----
+    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
+    CvQu4ZafupflbkEMwqy+BJPdgLBz7g==
+    -----END PRIVATE KEY-----
   ACCESS_TOKEN_EXPIRE_SECONDS: "3600"
   ACTIVATE_TOKEN_EXPIRE_SECONDS: "1800"
   REFRESH_TOKEN_EXPIRE_SECONDS: "2678400"
@@ -100,9 +120,7 @@ data:
   # PATH
   ROOT_PATH: /auth-api
 
-  RABBIT_HOST: rabbit
-  RABBIT_USERNAME: rfidio
-  RABBIT_PASSWORD: rfidio
+  RABBIT_HOST: mq
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -142,6 +160,16 @@ spec:
                 secretKeyRef:
                   name: db
                   key: POSTGRES_PASSWORD
+            - name: RABBIT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_PASS
           envFrom:
             - configMapRef:
                 name: auth-config
