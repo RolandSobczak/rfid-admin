@@ -1,0 +1,187 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+  namespace: rfid-main
+data:
+  SETTINGS_PATH: "auth.settings.base.Settings"
+  PUBLIC_KEY: |
+    -----BEGIN PUBLIC KEY-----
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArNR+B9ahtbsYerULcvqz
+    DOW1uzIkazUsr6oM03z5E/yEoxbLj/Wq9fUa64sPreeQ0HebBOOL5bD5zBbvh+GS
+    qdsbLg6XRdMTIlo+qQFXUavOPHDvnVJvh3H8vKlYeEBA5Lw8Z7z5+Ph0lFmue6yh
+    vxlry6LBJB3uabo0Ds1hc62hhdAnCZqu8kDfD9LnA/433wdf03Sgt/kjoXJ9fgUt
+    LcYumEeVdv7AJXR7U0p46CQwdTL82w9dBVWfVmcsAcvae9hr6ENxVzRVyx+HV8Jk
+    8LXL9Yh4N+H/HviRGOdBWfSQmlzh/FArG2izqEi4h6MnmctD0v7I1YAwtvoT8DCy
+    5ri4Dy3Uz9n15eJ6DmEKE304zXPDQ2WaH2AlXxidl9Kichsrp4JsaAJLHOafyYPE
+    c+1iRT+Sb2yNUsQDBJ6F5IkLzuewdHeVbWyuCoGxUZnQMGKfAUkNBEEnZiNzYPka
+    Pwf+rHEecPoq51l8j9icF+t5IdxQNlXun4xuj4QwPl4MLJeVY1JtEGahspiEU1h4
+    dQN1CLlBEmObZDoJuwzHKOK1aW/WLR/sRSHIf6KozcsmDG0kQtNfqgykDm0n9Vu9
+    rc5b09aaBUO947BEK7tBS9xflC92NXclE7rIzgxv1rcWbC9udFUNYWgVZtLZbP1O
+    JdshyHNA7X84mhM09YiKnU8CAwEAAQ==
+    -----END PUBLIC KEY-----
+  PRIVATE_KEY: |
+    -----BEGIN RSA PRIVATE KEY-----
+    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
+    j1WpI8DbXWj3grrs
+
+  ACCESS_TOKEN_EXPIRE_SECONDS: "3600"
+  ACTIVATE_TOKEN_EXPIRE_SECONDS: "1800"
+  REFRESH_TOKEN_EXPIRE_SECONDS: "2678400"
+  PASSWORD_RESET_TOKEN_EXPIRE_SECONDS: "3600"
+  LONG_TERM_TOKEN_EXPIRE_DAYS: "365"
+
+  # ENV
+  ENV_TYPE: dev
+
+  # Logging
+  LOG_LEVEL: DEBUG
+
+  # CONFIRMATION
+  CONFIRMATION_URL: "https://frontend/confirm/{{ token }}/"
+
+  # RESET PASSWORD
+  RESET_PASSWORD_URL: "https://frontend/reset/{{ token }}/"
+
+  ## BLOB STORAGE
+  BLOB_STORAGE_PROVIDER: BOTO
+  BLOB_STORAGE_HOST: http://minio:9000
+  BLOB_STORAGE_ACCESS_KEY: wmudSJj798gaatLLtRyY
+  BLOB_STORAGE_SECRET_KEY: qsSSVu5vkTuxiq1ut6XW7KsmRWonUxhQxKgQwEcH
+  BLOB_STORAGE_EXPIRE_SECONDS: "3600"
+  BLOB_STORAGE_SHARING_HOST: http://localhost:9000
+
+  # MAIL
+  EMAIL_HOST: sandbox.smtp.mailtrap.io
+  EMAIL_FROM: admin@rfidio.it
+  EMAIL_PORT: "2525"
+  EMAIL_USER: YOU-HAVE-TO-CHANGE-THIS
+  EMAIL_PASSWORD: YOU-HAVE-TO-CHANGE-THIS
+
+  # POSTGRES
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: auth
+
+  # CORS
+  ALLOWED_ORIGINS: "*"
+  ALLOW_CREDENTIALS: "True"
+  ALLOWED_METHODS: "*"
+  ALLOWED_HEADERS: "*"
+
+  # PATH
+  ROOT_PATH: /auth-api
+
+  RABBIT_HOST: rabbit
+  RABBIT_USERNAME: rfidio
+  RABBIT_PASSWORD: rfidio
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: auth
+  name: auth
+  namespace: rfid-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: auth
+    spec:
+      containers:
+        - image: localhost:32000/rfidio-auth:latest
+          imagePullPolicy: Always
+          name: auth
+          resources: {}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: POSTGRES_PASSWORD
+          envFrom:
+            - configMapRef:
+                name: auth-config
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: auth
+  name: auth
+  namespace: rfid-main
+spec:
+  ports:
+    - port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app: auth
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-ingress
+  namespace: rfid-main
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /auth-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth
+                port:
+                  number: 8000
