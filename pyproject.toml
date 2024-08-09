@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "rfid-kube"
+version = "0.1.0"
+description = ""
+authors = ["Roland Sobczak <rolandsobczak@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = {extras = ["standard"], version = "^0.112.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
