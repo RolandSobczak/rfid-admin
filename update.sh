@@ -7,7 +7,7 @@ if [ -z "$git_sha" ]; then
     exit 1
 fi
 
-rfid_auth="localhost:32000/rfidio-auth-auth:${git_sha}"
+rfid_auth="localhost:32000/rfidio-auth:${git_sha}"
 rfid_auth_latest="localhost:32000/rfidio-auth:latest"
 
 docker build -t $rfid_auth  -t $rfid_auth_latest -f docker/auth/auth.dockerfile .
@@ -27,5 +27,9 @@ rfid_external_latest="localhost:32000/rfidio-external:latest"
 docker build -t $rfid_external -t $rfid_external_latest -f docker/external/external.dockerfile .
 docker push $rfid_external
 docker push $rfid_external_latest
+
+ kubectl set image deployments --namespace=rfid-main --selector="app=auth" auth=$rfid_auth
+ kubectl set image deployments --namespace=rfid-main --selector="app=tenant" tenant=$rfid_tenant
+ kubectl set image deployments --namespace=rfid-main --selector="app=external" external=$rfid_external
 
 cd -
