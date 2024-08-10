@@ -1,6 +1,7 @@
 from kubernetes import client, config
 
 from src.schemas.users import UserCreationModel, TenantProfileSchema
+from src.schemas.tenants import TenantSchema
 from .base import BaseService
 
 
@@ -153,7 +154,7 @@ class KubeAPIService(BaseService):
         self._create_service(tenant)
         self._create_ingress(networking_v1_api, tenant)
 
-    def destroy_tenant(self, tenant: TenantProfileSchema):
+    def destroy_tenant(self, tenant: TenantSchema):
         config.load_kube_config()
         k8s_apps_v1 = client.AppsV1Api()
         k8s_apps_v1.delete_namespaced_deployment(tenant.slug, self._settings.NAMESPACE)

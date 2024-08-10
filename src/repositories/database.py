@@ -1,6 +1,8 @@
-from src.schemas.users import UserReadSchema
+from typing import Optional, List
+from fastapi import HTTPException
 
 from sqlalchemy import create_engine, text
+from src.schemas.tenants import TenantSchema, OwnerProfile
 from sqlalchemy_utils.functions import database_exists, create_database, drop_database
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -37,9 +39,113 @@ class DBService(BaseService):
         except SQLAlchemyError as e:
             print(f"An error occurred: {e}")
 
-    def get_user_by_email(self, user_email):
-        pass
+    # def get_user_by_email(self, user_email):
+    #     pass
 
     def drop_database(self, db_name: str):
         if not database_exists(self._settings.DBHOST + db_name):
             drop_database(self._settings.DBHOST + db_name)
+
+    def get_tenant_by_id(self, tenant_id: int) -> Optional[TenantSchema]:
+        engine = create_engine(self._settings.DBHOST + "auth", echo=True)
+
+        with engine.connect() as conn:
+            with conn.begin():
+                stmt = """SELECT
+                            t.created_at,
+                            t.updated_at,
+                            t.id,
+                            t.name,
+                            t.slug,
+                            t.type,
+                            u.id,
+                            u.email
+                        FROM tenants t
+                        INNER JOIN users u ON u.id = t.owner_id
+                        WHERE t.id = :tenant_id
+                        """
+                res = conn.execute(text(stmt), {"tenant_id": tenant_id}).fetchone()
+                if res is None:
+                    return None
+                (
+                    created_at,
+                    updated_at,
+                    tenant_id,
+                    tenant_name,
+                    tenant_slug,
+                    tenant_type,
+                    owner_id,
+                    owner_email,
+                ) = res
+                return TenantSchema(
+                    created_at=created_at,
+                    updated_at=updated_at,
+                    id=tenant_id,
+                    name=tenant_name,
+                    slug=tenant_slug,
+                    type=tenant_type,
+                    owner=OwnerProfile(
+                        id=owner_id,
+                        email=owner_email,
+                    ),
+                )
+
+    def get_one_or_404(self, tenant_id: int) -> TenantSchema:
+        tenant = self.get_tenant_by_id(tenant_id)
+        if tenant is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Tenant not found",
+            )
+
+        return tenant
+
+    def get_tenants_list(self) -> List[TenantSchema]:
+        engine = create_engine(self._settings.DBHOST + "auth", echo=True)
+
+        with engine.connect() as conn:
+            with conn.begin():
+                stmt = """SELECT
+                            t.created_at,
+                            t.updated_at,
+                            t.id,
+                            t.name,
+                            t.slug,
+                            t.type,
+                            u.id,
+                            u.email
+                        FROM tenants t
+                        INNER JOIN users u ON u.id = t.owner_id
+                        """
+                res = conn.execute(text(stmt))
+
+                if res is None:
+                    return None
+
+                out = []
+                for row in res:
+                    (
+                        created_at,
+                        updated_at,
+                        tenant_id,
+                        tenant_name,
+                        tenant_slug,
+                        tenant_type,
+                        owner_id,
+                        owner_email,
+                    ) = row
+                    tenant = TenantSchema(
+                        created_at=created_at,
+                        updated_at=updated_at,
+                        id=tenant_id,
+                        name=tenant_name,
+                        slug=tenant_slug,
+                        type=tenant_type,
+                        owner=OwnerProfile(
+                            id=owner_id,
+                            email=owner_email,
+                        ),
+                    )
+                    out.append(tenant)
+
+                return out

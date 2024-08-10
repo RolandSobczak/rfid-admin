@@ -1,11 +1,9 @@
 import datetime
 from enum import Enum
+
 from pydantic import BaseModel, PositiveInt
 
-
-class TimestampedMixin:
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+from .mixins import TimestampedMixin
 
 
 class TenantType(Enum):
