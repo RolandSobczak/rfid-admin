@@ -97,3 +97,22 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: postgres
+  name: db-np
+  namespace: rfid-main
+spec:
+  ports:
+    - port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app: postgres
+  type: NodePort
+status:
+  loadBalancer: {}

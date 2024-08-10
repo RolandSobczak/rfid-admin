@@ -25,7 +25,6 @@ data:
     -----END PUBLIC KEY-----
 
   # TENANT
-  TENANT_ID: "1"
 
   # AUTH API
   AUTH_API_HOST: http://auth:8000
@@ -39,9 +38,6 @@ data:
   # POSTGRES
   POSTGRES_HOST: db
   POSTGRES_PORT: "5432"
-  POSTGRES_DB: tenant
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
 
   # CORS
   ALLOWED_ORIGINS: "*"
@@ -85,6 +81,12 @@ spec:
           ports:
             - containerPort: 8000
           env:
+            - name:
+                key: POSTGRES_DB
+                value: "tenant"
+            - name:
+                key: TENANT_ID
+                value: "1"
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
