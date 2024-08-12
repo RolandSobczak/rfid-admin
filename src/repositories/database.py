@@ -43,7 +43,7 @@ class DBService(BaseService):
     #     pass
 
     def drop_database(self, db_name: str):
-        if not database_exists(self._settings.DBHOST + db_name):
+        if database_exists(self._settings.DBHOST + db_name):
             drop_database(self._settings.DBHOST + db_name)
 
     def get_tenant_by_id(self, tenant_id: int) -> Optional[TenantSchema]:
