@@ -88,6 +88,7 @@ class DBService(BaseService):
                         id=owner_id,
                         email=owner_email,
                     ),
+                    healthy=False,
                 )
 
     def get_one_or_404(self, tenant_id: int) -> TenantSchema:
@@ -145,6 +146,7 @@ class DBService(BaseService):
                             id=owner_id,
                             email=owner_email,
                         ),
+                        healthy=False,
                     )
                     out.append(tenant)
 

@@ -1,11 +1,18 @@
+from typing import List
 from kubernetes import client, config
+from kubernetes.client.rest import ApiException
 
 from src.schemas.users import UserCreationModel, TenantProfileSchema
 from src.schemas.tenants import TenantSchema
+from src.schemas.deployments import DeploymentSchema
 from .base import BaseService
 
 
 class KubeAPIService(BaseService):
+    def __init__(self):
+        super().__init__()
+        config.load_kube_config()
+
     def _create_deployment(self, apps_v1_api, tenant: TenantProfileSchema):
         container = client.V1Container(
             name="tenant",
@@ -80,7 +87,9 @@ class KubeAPIService(BaseService):
         deployment = client.V1Deployment(
             api_version="apps/v1",
             kind="Deployment",
-            metadata=client.V1ObjectMeta(name=tenant.slug),
+            metadata=client.V1ObjectMeta(
+                name=tenant.slug, labels={"app": "tenant", "tenant": tenant.slug}
+            ),
             spec=spec,
         )
         # Creation of the Deployment in specified namespace
@@ -164,3 +173,91 @@ class KubeAPIService(BaseService):
         networking_v1_api.delete_namespaced_ingress(
             tenant.slug, self._settings.NAMESPACE
         )
+
+    def list_raw_deployments(self) -> List[dict]:
+        api_instance = client.AppsV1Api()
+        api_response = api_instance.list_namespaced_deployment(namespace="rfid-main")
+        return [
+            {"name": deploy.metadata.name, "labels": deploy.metadata.labels}
+            for deploy in api_response.items
+        ]
+
+    def read_status(self, pod_name: str) -> List[dict]:
+        try:
+            api_instance = client.CoreV1Api()
+            api_response = api_instance.read_namespaced_pod_status(
+                pod_name, self._settings.NAMESPACE, pretty=True
+            )
+            return [
+                {
+                    "name": container.name,
+                    "ready": container.ready,
+                }
+                for container in api_response.status.container_statuses
+            ]
+        except ApiException as e:
+            print(
+                "Exception when calling CoreV1Api->read_namespaced_pod_status: %s\n" % e
+            )
+
+    def load_logs(self, pod_name: str):
+        api_instance = client.CoreV1Api()
+        pod_logs = api_instance.read_namespaced_pod_log(
+            name=pod_name, namespace=self._settings.NAMESPACE
+        )
+        return pod_logs
+
+    def get_deploy_pods(self, label_selector: str) -> List[str]:
+        api_instance = client.CoreV1Api()
+        pods = api_instance.list_namespaced_pod(
+            namespace=self._settings.NAMESPACE, label_selector=label_selector
+        )
+
+        return [pod.metadata.name for pod in pods.items]
+
+    def list_deployments(self) -> List[DeploymentSchema]:
+        raw_deployments = self.list_raw_deployments()
+        deployments = []
+        for deploy in raw_deployments:
+            deploy_name = deploy["name"]
+            print(deploy_name)
+            app = deploy["labels"]["app"]
+            pods_selector = ""
+            if deploy["labels"].get("tenant"):
+                tenant = deploy["labels"]["tenant"]
+                pods_selector = f"app=tenant,tenant={tenant}"
+            else:
+                pods_selector = f"app={deploy_name}"
+
+            pods = self.get_deploy_pods(pods_selector)
+            if len(pods) > 0:
+                containers_status = self.read_status(pods[0])
+                if len(containers_status) > 0:
+                    containers_ready = all(
+                        [container.get("ready") for container in containers_status]
+                    )
+                    deployments.append(
+                        DeploymentSchema(
+                            name=deploy_name,
+                            ready=containers_ready,
+                        )
+                    )
+
+        return deployments
+
+    def fetch_deploy_logs(self, deploy_name: str):
+        api_instance = client.AppsV1Api()
+        deploy = api_instance.read_namespaced_deployment(
+            deploy_name,
+            self._settings.NAMESPACE,
+        )
+        labels = deploy.metadata.labels
+        pods_selector = ""
+        if tenant := labels.get("tenant"):
+            pods_selector = f"app=tenant,tenant={tenant}"
+        else:
+            pods_selector = f"app={deploy_name}"
+
+        pods = self.get_deploy_pods(pods_selector)
+        logs = self.load_logs(pods[0])
+        return logs

@@ -22,9 +22,9 @@ async def deploy_tenant(
 
 @router.get("", response_model=List[TenantSchema])
 async def list_tenants(
-    database_serv: Annotated[DBService, Depends(DBService)],
+    tenant_serv: Annotated[TenantService, Depends(TenantService)],
 ):
-    return database_serv.get_tenants_list()
+    return await tenant_serv.list_tenants()
 
 
 @router.get("/{tenant_id}", response_model=TenantSchema)

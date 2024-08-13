@@ -15,3 +15,4 @@ class TenantSchema(BaseModel, TimestampedMixin):
     name: str
     slug: str
     type: TenantType
+    healthy: bool
