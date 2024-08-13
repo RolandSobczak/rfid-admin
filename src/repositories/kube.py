@@ -207,20 +207,33 @@ class KubeAPIService(BaseService):
         )
         return pod_logs
 
-    def get_deploy_pods(self, label_selector: str) -> List[str]:
+    def get_deploy_pods(self, label_selector: str) -> List[dict]:
         api_instance = client.CoreV1Api()
         pods = api_instance.list_namespaced_pod(
             namespace=self._settings.NAMESPACE, label_selector=label_selector
         )
+        print(pods.items[0].spec.containers[0].image)
 
-        return [pod.metadata.name for pod in pods.items]
+        out = []
+        for pod in pods.items:
+            pod_name = pod.metadata.name
+            containers = [
+                {"name": container.name, "image": container.image}
+                for container in pod.spec.containers
+            ]
+            out.append(
+                {
+                    "name": pod_name,
+                    "containers": containers,
+                }
+            )
+        return out
 
     def list_deployments(self) -> List[DeploymentSchema]:
         raw_deployments = self.list_raw_deployments()
         deployments = []
         for deploy in raw_deployments:
             deploy_name = deploy["name"]
-            print(deploy_name)
             app = deploy["labels"]["app"]
             pods_selector = ""
             if deploy["labels"].get("tenant"):
@@ -231,7 +244,7 @@ class KubeAPIService(BaseService):
 
             pods = self.get_deploy_pods(pods_selector)
             if len(pods) > 0:
-                containers_status = self.read_status(pods[0])
+                containers_status = self.read_status(pods[0]["name"])
                 if len(containers_status) > 0:
                     containers_ready = all(
                         [container.get("ready") for container in containers_status]
@@ -240,6 +253,7 @@ class KubeAPIService(BaseService):
                         DeploymentSchema(
                             name=deploy_name,
                             ready=containers_ready,
+                            containers=pods[0]["containers"],
                         )
                     )
 
@@ -259,5 +273,5 @@ class KubeAPIService(BaseService):
             pods_selector = f"app={deploy_name}"
 
         pods = self.get_deploy_pods(pods_selector)
-        logs = self.load_logs(pods[0])
+        logs = self.load_logs(pods[0]["name"])
         return logs
