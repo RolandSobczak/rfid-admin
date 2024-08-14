@@ -1,0 +1,7 @@
+services:
+  backup:
+    build:
+      context: worker
+      dockerfile: Dockerfile
+    volumes:
+      - ./backups:/var/backup/

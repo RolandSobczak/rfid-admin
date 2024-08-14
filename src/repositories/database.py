@@ -101,6 +101,51 @@ class DBService(BaseService):
 
         return tenant
 
+    def get_tenant_by_slug(self, tenant_slug: str) -> Optional[TenantSchema]:
+        engine = create_engine(self._settings.DBHOST + "auth", echo=True)
+
+        with engine.connect() as conn:
+            with conn.begin():
+                stmt = """SELECT
+                            t.created_at,
+                            t.updated_at,
+                            t.id,
+                            t.name,
+                            t.slug,
+                            t.type,
+                            u.id,
+                            u.email
+                        FROM tenants t
+                        INNER JOIN users u ON u.id = t.owner_id
+                        WHERE t.slug = :tenant_slug
+                        """
+                res = conn.execute(text(stmt), {"tenant_slug": tenant_slug}).fetchone()
+                if res is None:
+                    return None
+                (
+                    created_at,
+                    updated_at,
+                    tenant_id,
+                    tenant_name,
+                    tenant_slug,
+                    tenant_type,
+                    owner_id,
+                    owner_email,
+                ) = res
+                return TenantSchema(
+                    created_at=created_at,
+                    updated_at=updated_at,
+                    id=tenant_id,
+                    name=tenant_name,
+                    slug=tenant_slug,
+                    type=tenant_type,
+                    owner=OwnerProfile(
+                        id=owner_id,
+                        email=owner_email,
+                    ),
+                    healthy=False,
+                )
+
     def get_tenants_list(self) -> List[TenantSchema]:
         engine = create_engine(self._settings.DBHOST + "auth", echo=True)
 

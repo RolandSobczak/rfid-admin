@@ -5,6 +5,7 @@ from kubernetes.client.rest import ApiException
 from src.schemas.users import UserCreationModel, TenantProfileSchema
 from src.schemas.tenants import TenantSchema
 from src.schemas.deployments import DeploymentSchema
+from src.schemas.backups import BackupSchedulerSchema, BackupSchedulerCreationSchema
 from .base import BaseService
 
 
@@ -275,3 +276,80 @@ class KubeAPIService(BaseService):
         pods = self.get_deploy_pods(pods_selector)
         logs = self.load_logs(pods[0]["name"])
         return logs
+
+    @staticmethod
+    def _resolve_cron_wildcard(val: int) -> str:
+        if val < 0:
+            return "*"
+        return str(val)
+
+    def schedule_backup(self, schema: BackupSchedulerSchema):
+        job_template = client.V1JobTemplateSpec(
+            metadata=client.V1ObjectMeta(
+                namespace=self._settings.NAMESPACE,
+            ),
+            spec=client.V1JobSpec(
+                template=client.V1PodTemplateSpec(
+                    metadata=client.V1ObjectMeta(namespace=self._settings.NAMESPACE),
+                    spec=client.V1PodSpec(
+                        restart_policy="OnFailure",
+                        containers=[
+                            client.V1Container(
+                                name="sender",
+                                image="localhost:32000/sender:latest",
+                                image_pull_policy="Always",
+                                env=[
+                                    client.V1EnvVar(
+                                        name="DB_NAME",
+                                        value=schema.app,
+                                    )
+                                ],
+                            )
+                        ],
+                    ),
+                )
+            ),
+        )
+
+        cronjob = client.V1CronJob(
+            api_version="batch/v1",
+            kind="CronJob",
+            metadata=client.V1ObjectMeta(
+                name=schema.scheduler_name, namespace=self._settings.NAMESPACE
+            ),
+            spec=client.V1CronJobSpec(
+                schedule=schema.schedule,
+                job_template=job_template,
+            ),
+        )
+
+        batch_v1 = client.BatchV1Api()
+        batch_v1.create_namespaced_cron_job(
+            namespace=self._settings.NAMESPACE, body=cronjob
+        )
+
+    def list_cron_jobs(self) -> List[BackupSchedulerSchema]:
+        api_instance = client.BatchV1Api()
+        api_response = api_instance.list_namespaced_cron_job(self._settings.NAMESPACE)
+        out = []
+        for cron in api_response.items:
+            name = cron.metadata.name
+            schedule = cron.spec.schedule
+            db_name_env = list(
+                filter(
+                    lambda env: env.name == "DB_NAME",
+                    cron.spec.job_template.spec.template.spec.containers[0].env,
+                )
+            )[0]
+            db_name = db_name_env.value
+            out.append(
+                BackupSchedulerSchema(
+                    scheduler_name=name,
+                    db_name=db_name,
+                    schedule=schedule,
+                )
+            )
+        return out
+
+    def get_deploy_backups(self) -> List[BackupSchedulerSchema]:
+        pass

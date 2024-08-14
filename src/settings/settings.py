@@ -3,3 +3,9 @@ class Settings:
     TENANT_API_TEMPLATE = "http://192.168.0.92/{{ tenant_slug }}"
     DBHOST = "postgresql://rfid:n1S8&e3H&,m&@192.168.0.92:31633/"
     NAMESPACE = "rfid-main"
+    RABBIT_CONFIG = {
+        "HOST": "192.168.0.92",
+        "PORT": 31118,
+        "USER": "rfid",
+        "PASSWORD": "vK177~g)(22@",
+    }
