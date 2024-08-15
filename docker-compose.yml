@@ -1,7 +1,14 @@
 services:
-  backup:
+  worker:
     build:
-      context: worker
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: docker/worker/Dockerfile
     volumes:
       - ./backups:/var/backup/
+  backend:
+    build:
+      context: ./
+      dockerfile: docker/admin_backend/Dockerfile
+    volumes:
+      - ./backups:/var/backup/
+
