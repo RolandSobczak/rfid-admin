@@ -1,6 +1,18 @@
-cd /home/rsobczak/code/RFIDIO-Backend
+#REPO_ROOT="/home/rsobczak/code/RFIDIO-Backend"
+REPO_ROOT="."
+cd $REPO_ROOT
 
+prev_git_sha=$(git rev-parse HEAD)
+git pull
 git_sha=$(git rev-parse HEAD)
+
+if [ $git_sha -eq $prev_git_sha]; then
+  exit 0
+fi
+
+echo "New version found..."
+echo "Running pipeline."
+echo "Current commit: $git_sha"
 
 if [ -z "$git_sha" ]; then
     echo "Error: Git SHA is empty. Please check if you're in a valid Git repository."

@@ -5,9 +5,9 @@ import sys
 import json
 import datetime
 
-from src.schemas.users import UserCreationModel, TenantProfileSchema
-from src.schemas.tenants import TenantSchema
-from src.schemas.deployments import DeploymentSchema
+from backend.schemas.users import UserCreationModel, TenantProfileSchema
+from backend.schemas.tenants import TenantSchema
+from backend.schemas.deployments import DeploymentSchema
 from .base import BaseService
 
 

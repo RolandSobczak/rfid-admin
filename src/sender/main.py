@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 import datetime
 import json
-import os
-
 
 import pika
 
+from sender.settings import Settings
+
+
+settings = Settings()
+
 
 def request_backup(db_name: str):
-    credentials = pika.PlainCredentials("rfid", "vK177~g)(22@")
-    parameters = pika.ConnectionParameters("192.168.0.92", 31118, "/", credentials)
+    credentials = pika.PlainCredentials(
+        settings.RABBIT_CONFIG["USER"], settings.RABBIT_CONFIG["PASSWORD"]
+    )
+    parameters = pika.ConnectionParameters(
+        settings.RABBIT_CONFIG["HOST"], settings.RABBIT_CONFIG["PORT"], "/", credentials
+    )
 
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
@@ -28,7 +35,7 @@ def request_backup(db_name: str):
 
 
 def main():
-    request_backup(os.environ["DB_NAME"])
+    request_backup(settings.RABBIT_CONFIG["DB_NAME"])
 
 
 if __name__ == "__main__":

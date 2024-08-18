@@ -2,17 +2,20 @@ from typing import List
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
-from src.schemas.users import UserCreationModel, TenantProfileSchema
-from src.schemas.tenants import TenantSchema
-from src.schemas.deployments import DeploymentSchema
-from src.schemas.backups import BackupSchedulerSchema, BackupSchedulerCreationSchema
+from backend.schemas.users import UserCreationModel, TenantProfileSchema
+from backend.schemas.tenants import TenantSchema
+from backend.schemas.deployments import DeploymentSchema
+from backend.schemas.backups import BackupSchedulerSchema, BackupSchedulerCreationSchema
 from .base import BaseService
 
 
 class KubeAPIService(BaseService):
     def __init__(self):
         super().__init__()
-        config.load_kube_config()
+        if self._settings.INSIDE_CLUSTER:
+            config.load_incluster_config()
+        else:
+            config.load_kube_config()
 
     def _create_deployment(self, apps_v1_api, tenant: TenantProfileSchema):
         container = client.V1Container(
@@ -156,7 +159,6 @@ class KubeAPIService(BaseService):
         )
 
     def deploy_tenant(self, tenant: TenantProfileSchema):
-        config.load_kube_config()
         apps_v1_api = client.AppsV1Api()
         networking_v1_api = client.NetworkingV1Api()
 
@@ -165,7 +167,6 @@ class KubeAPIService(BaseService):
         self._create_ingress(networking_v1_api, tenant)
 
     def destroy_tenant(self, tenant: TenantSchema):
-        config.load_kube_config()
         k8s_apps_v1 = client.AppsV1Api()
         k8s_apps_v1.delete_namespaced_deployment(tenant.slug, self._settings.NAMESPACE)
         core_v1_api = client.CoreV1Api()
@@ -296,7 +297,7 @@ class KubeAPIService(BaseService):
                         containers=[
                             client.V1Container(
                                 name="sender",
-                                image="localhost:32000/sender:latest",
+                                image="localhost:32000/rfidio-mq-sender:latest",
                                 image_pull_policy="Always",
                                 env=[
                                     client.V1EnvVar(

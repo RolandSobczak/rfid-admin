@@ -2,8 +2,8 @@ import httpx
 from jinja2 import Template
 from typing import List
 
-from schemas.users import TenantProfileSchema, UserCreationModel
-from schemas.tenants import TenantSchema
+from backend.schemas.users import TenantProfileSchema, UserCreationModel
+from backend.schemas.tenants import TenantSchema
 from .auth_api import AuthAPIService
 from .database import DBService
 from .kube import KubeAPIService

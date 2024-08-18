@@ -16,8 +16,11 @@ COPY src/worker/poetry.lock src/worker/pyproject.toml /src/
 RUN poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-root --no-directory --no-dev
 
-COPY src/worker/main.py /src/main.py
+COPY src/worker /src/worker
+COPY src/shared /src/shared
 
-ENTRYPOINT ["python", "/src/main.py"]
+ENV PYTHONPATH="/src/worker:$PYTHONPATH"
+
+ENTRYPOINT ["python", "/src/worker/main.py"]
 
 

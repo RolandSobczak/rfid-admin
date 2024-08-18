@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: admin-front
+  name: admin-front
+  namespace: rfid-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-front
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: admin-front
+    spec:
+      containers:
+        - image: localhost:32000/admin-front:latest
+          imagePullPolicy: Always
+          name: admin-front
+          resources: {}
+          ports:
+            - containerPort: 80
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: admin-front
+  name: admin-front
+  namespace: rfid-main
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: admin-front
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-front-ingress
+  namespace: rfid-main
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /admin(/|$)(.*)
+          #- path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-front
+                port:
+                  number: 80

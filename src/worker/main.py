@@ -11,21 +11,24 @@ BACKUP_PATH = "/var/backup/"
 
 from plumbum.cmd import pg_dump
 from plumbum import local
+from worker.settings import Settings
+
+settings = Settings()
 
 
 def backup_db(db_name: str, filename: str):
     with open(filename, mode="w") as f:
-        with local.env(PGPASSWORD="n1S8&e3H&,m&"):
+        with local.env(PGPASSWORD=settings.POSTGRES_CONFIG["PASSWORD"]):
             (
                 pg_dump[
                     "-a",
                     "-Z",
                     "9",
                     "-h",
-                    "192.168.0.92",
+                    settings.POSTGRES_CONFIG["HOST"],
                     "-U",
-                    "rfid",
-                    "--port=31118",
+                    settings.POSTGRES_CONFIG["USER"],
+                    f"--port={settings.POSTGRES_CONFIG['PORT']}",
                     db_name,
                 ]
                 > f
@@ -43,8 +46,12 @@ def callback(ch, method, properties, body):
 
 
 def main():
-    credentials = pika.PlainCredentials("rfid", "vK177~g)(22@")
-    parameters = pika.ConnectionParameters("192.168.0.92", 31118, "/", credentials)
+    credentials = pika.PlainCredentials(
+        settings.RABBIT_CONFIG["USER"], settings.RABBIT_CONFIG["PASSWORD"]
+    )
+    parameters = pika.ConnectionParameters(
+        settings.RABBIT_CONFIG["HOST"], settings.RABBIT_CONFIG["PORT"], "/", credentials
+    )
 
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
@@ -52,11 +59,11 @@ def main():
 
     channel.exchange_declare(exchange="backups", exchange_type="topic")
 
-    result = channel.queue_declare("backups", exclusive=True)
+    result = channel.queue_declare("", exclusive=True)
     queue_name = result.method.queue
     channel.queue_bind(exchange="backups", queue=queue_name, routing_key="admin.*")
 
-    print(" [*] Waiting for logs. To exit press CTRL+C")
+    print("WORKER CONNECTED", flush=True)
 
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
@@ -72,4 +79,3 @@ if __name__ == "__main__":
             sys.exit(0)
         except SystemExit:
             os._exit(0)
-    # backup_db("auth")

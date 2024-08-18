@@ -1,9 +1,16 @@
+from typing import List
 import datetime
 from enum import Enum
 
 from pydantic import BaseModel, PositiveInt
 
 from .mixins import TimestampedMixin
+
+
+class UserType(Enum):
+    ROOT = "root"
+    IAM = "iam"
+    SERVICE = "service"
 
 
 class TenantType(Enum):
@@ -52,3 +59,14 @@ class UserReadSchema(BaseModel, TimestampedMixin):
     is_superuser: bool
     is_confirmed: bool
     is_active: bool
+
+
+class AuthenticatedUser(BaseModel):
+    id: int
+    username: str
+    scope: list[str]
+    type: UserType
+    tenant_id: int
+    tenant_name: str
+    allowed_locations: List[int]
+    permissions: List[str]

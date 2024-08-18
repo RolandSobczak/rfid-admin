@@ -75,6 +75,9 @@ spec:
                 secretKeyRef:
                   name: db
                   key: POSTGRES_PASSWORD
+          volumeMounts:
+          - name: db-data
+            mountPath: "/var/lib/postgresql/data"
           ports:
             - containerPort: 5432
 status: {}

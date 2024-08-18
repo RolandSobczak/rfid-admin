@@ -2,7 +2,8 @@ FROM python:3.11.8 as lint
 
 WORKDIR /src
 
-COPY src/backend /src
+COPY src/shared /src/shared
+COPY src/backend /src/backend
 
 RUN pip3 install black isort && \
   python -m black /src && \
@@ -49,11 +50,12 @@ RUN if [ ${BUILD_ENV} = "dev" ]; then \
   rm -f /src/poetry.lock /src/pyproject.toml; \
   fi
 
-COPY --chown=python:python src/backend/poetry.lock src/backend/pyproject.toml /src/
-COPY --from=lint --chown=python:python /src /src/
-COPY docker/admin_backend/entrypoint.sh /entrypoint.sh
+COPY --chown=python:python src/backend/poetry.lock /src/backend/pyproject.toml /src/
+COPY  --chown=python:python src/shared /src/shared
+COPY --from=lint --chown=python:python src/backend /src/backend
+COPY docker/backend/entrypoint.sh /entrypoint.sh
 RUN chmod 777 /entrypoint.sh
-COPY docker/admin_backend/callback.py /callback.py
+COPY docker/backend/callback.py /callback.py
 RUN chmod 777 /callback.py
 
 ENV TZ Europe/Warsaw

@@ -1,7 +1,7 @@
 import httpx
 from fastapi import HTTPException
 
-from src.schemas.users import UserCreationModel, UserReadSchema
+from backend.schemas.users import UserCreationModel, UserReadSchema
 from .base import BaseService
 
 

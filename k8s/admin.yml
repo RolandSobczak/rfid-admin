@@ -1,0 +1,253 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-config
+  namespace: rfid-main
+data:
+  # ENV
+  ENV_TYPE: dev
+  INSIDE_CLUSTER: "True" 
+
+  # Logging
+  LOG_LEVEL: DEBUG
+
+  #AUTH
+  AUTH_API_HOST: http://auth:8000/v1
+  TENANT_API_TEMPLATE: "http://{{ tenant_slug }}:8000"
+
+  # POSTGRES
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: admin
+
+  # CORS
+  ALLOWED_ORIGINS: "*"
+  ALLOW_CREDENTIALS: "True"
+  ALLOWED_METHODS: "*"
+  ALLOWED_HEADERS: "*"
+
+  # PATH
+  ROOT_PATH: /admin-api
+
+  #MQ
+  RABBIT_HOST: mq
+  RABBIT_PORT: "5672"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rfid-main-bak
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /var/k8s/rfid-bak
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - homeserver
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rfid-bak
+  namespace: rfid-main
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: admin-api 
+  name: admin 
+  namespace: rfid-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-api 
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: admin-api 
+    spec:
+      volumes:
+        - name: bak-data
+          persistentVolumeClaim:
+            claimName: rfid-bak
+      containers:
+        - image: localhost:32000/rfidio-admin:latest 
+          imagePullPolicy: Always
+          name: admin-api
+          resources: {}
+          envFrom:
+            - configMapRef:
+                name: admin-config
+          env:
+            - name: NAMESPACE 
+              value: "rfid-main"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: POSTGRES_PASSWORD
+            - name: RABBIT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_PASS
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+          - name: bak-data
+            mountPath: /var/backups
+status: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-worker-config
+  namespace: rfid-main
+data:
+  # Env
+  ENV_TYPE: dev
+
+  #Storage
+  BACKUP_DIR: /var/backup
+
+  # Logging
+  LOG_LEVEL: DEBUG
+
+  # Postgres
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: admin
+
+  #MQ
+  RABBIT_HOST: mq
+  RABBIT_PORT: "5672"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: admin-worker 
+  name: admin-worker
+  namespace: rfid-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-worker
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: admin-worker
+    spec:
+      volumes:
+        - name: bak-data
+          persistentVolumeClaim:
+            claimName: rfid-bak
+      containers:
+        - image: localhost:32000/rfidio-admin-worker:latest 
+          imagePullPolicy: Always
+          name: admin-worker
+          resources: {}
+          envFrom:
+            - configMapRef:
+                name: admin-worker-config
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db
+                  key: POSTGRES_PASSWORD
+            - name: RABBIT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_USER
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBITMQ_DEFAULT_PASS
+          volumeMounts:
+          - name: bak-data
+            mountPath: /var/backups
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: admin-api 
+  name: admin-api
+  namespace: rfid-main
+spec:
+  ports:
+    - port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app: admin-api 
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-ingress
+  namespace: rfid-main
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /admin-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: admin-api
+                port:
+                  number: 8000

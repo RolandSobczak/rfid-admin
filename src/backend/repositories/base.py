@@ -1,4 +1,4 @@
-from src.settings import get_settings
+from backend.settings import get_settings
 
 
 class BaseService:

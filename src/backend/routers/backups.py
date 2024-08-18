@@ -4,22 +4,26 @@ from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.schemas.users import UserReadSchema, UserCreationModel
-from src.schemas.tenants import TenantSchema
-from src.schemas.backups import (
+from backend.schemas.users import UserReadSchema, UserCreationModel
+from backend.schemas.tenants import TenantSchema
+from backend.schemas.backups import (
     BackupSchema,
     BackupCreationSchema,
     BackupSchedulerSchema,
     BackupSchedulerCreationSchema,
 )
-from src.repositories import MQService, KubeAPIService, DBService
-
+from backend.repositories import MQService, KubeAPIService, DBService
+from backend.schemas.users import AuthenticatedUser
+from backend.permissions import RequireStaffToken
 
 router = APIRouter(prefix="/v1/backups", tags=["backups"])
 
 
 @router.get("/schedulers")  # , response_model=List[BackupSchema])
-async def list_schedulers(kube: Annotated[KubeAPIService, Depends(KubeAPIService)]):
+async def list_schedulers(
+    kube: Annotated[KubeAPIService, Depends(KubeAPIService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+):
     return kube.list_cron_jobs()
 
 
@@ -28,6 +32,7 @@ async def create_scheduler(
     schema: BackupSchedulerCreationSchema,
     db: Annotated[DBService, Depends(DBService)],
     kube: Annotated[KubeAPIService, Depends(KubeAPIService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
 ):
     if schema.app != "auth":
         db_tenant = db.get_tenant_by_slug(schema.app)
@@ -48,6 +53,7 @@ async def create_scheduler(
 async def request_backup(
     schema: BackupCreationSchema,
     mq: Annotated[MQService, Depends(MQService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
 ):
     mq.request_backup(schema.db_name)
     return schema
@@ -57,17 +63,21 @@ async def request_backup(
 async def last_backups(
     schema: BackupCreationSchema,
     mq: Annotated[MQService, Depends(MQService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
 ):
     pass
 
 
 @router.get("", response_model=List[str])
-async def list_by_db():
+async def list_by_db(user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())]):
     return os.listdir("backups")
 
 
 @router.get("/{db_name}", response_model=List[str])
-async def list_db_backups(db_name: str):
+async def list_db_backups(
+    db_name: str,
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+):
     try:
         return os.listdir(f"backups/{db_name}")
     except FileNotFoundError:

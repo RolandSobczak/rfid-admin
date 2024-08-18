@@ -2,7 +2,7 @@ from typing import Optional, List
 from fastapi import HTTPException
 
 from sqlalchemy import create_engine, text
-from src.schemas.tenants import TenantSchema, OwnerProfile
+from backend.schemas.tenants import TenantSchema, OwnerProfile
 from sqlalchemy_utils.functions import database_exists, create_database, drop_database
 from sqlalchemy.exc import SQLAlchemyError
 

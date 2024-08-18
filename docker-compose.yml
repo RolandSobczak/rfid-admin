@@ -5,10 +5,24 @@ services:
       dockerfile: docker/worker/Dockerfile
     volumes:
       - ./backups:/var/backup/
+      - ./src/worker:/src/worker
+      - ./src/shared:/src/shared
+    env_file:
+      - "env/worker.env"
   backend:
     build:
       context: ./
-      dockerfile: docker/admin_backend/Dockerfile
+      dockerfile: docker/backend/Dockerfile
+      args:
+        - BUILD_ENV=dev
+        - BUILD_USER=root
     volumes:
       - ./backups:/var/backup/
+      - ./src/backend:/src/backend
+      - ./src/shared:/src/shared
+
+    env_file:
+      - "env/backend.env"
+    ports:
+      - "8000:8000"
 
