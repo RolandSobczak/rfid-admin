@@ -33,9 +33,11 @@ def backup_db(db_name: str, filename: str):
                 ]
                 > f
             )()
+            print("BACKUP_CREATED", flush=True)
 
 
 def callback(ch, method, properties, body):
+    print("NEW TASK RECEIVED", flush=True)
     if "backups" in method.routing_key:
         req = json.loads(body)
         os.makedirs(BACKUP_PATH + req["db_name"], exist_ok=True)
