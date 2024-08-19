@@ -214,7 +214,6 @@ class KubeAPIService(BaseService):
         pods = api_instance.list_namespaced_pod(
             namespace=self._settings.NAMESPACE, label_selector=label_selector
         )
-        print(pods.items[0].spec.containers[0].image)
 
         out = []
         for pod in pods.items:
