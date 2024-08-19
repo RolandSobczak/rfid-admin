@@ -10,11 +10,14 @@ class Settings(BaseSettings):
     DBHOST: str
     NAMESPACE = "rfid-main"
     INSIDE_CLUSTER: bool
+    INSIDE_DOCKER: bool
     RABBIT_CONFIG: dict
     POSTGRES_CONFIG: dict
 
     def _load_data(self):
-        env.read_env("../../env/backend.env")
+        self.INSIDE_DOCKER = env.bool("INSIDE_DOCKER", default=True)
+        if not self.INSIDE_DOCKER:
+            env.read_env("../../env/backend.env")
 
         self.AUTH_API_HOST = env("AUTH_API_HOST")
         self.PUBLIC_KEY = env("PUBLIC_KEY")
