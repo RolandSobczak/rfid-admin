@@ -28,10 +28,13 @@ class TenantService(BaseService):
         )
 
         async with httpx.AsyncClient(base_url=tenant_url) as client:
-            res = await client.get("/healthcheck")
-            if res.status_code == 200:
-                return True
-            return False
+            try:
+                res = await client.get("/healthcheck")
+                if res.status_code == 200:
+                    return True
+                return False
+            except httpx.HTTPError:
+                return False
 
     async def list_tenants(self) -> List[TenantSchema]:
         db_tenants = self._db_serv.get_tenants_list()
