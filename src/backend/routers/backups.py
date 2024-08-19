@@ -56,7 +56,9 @@ async def request_backup(
     user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
 ):
     mq.request_backup(schema.db_name)
-    return schema
+    return BackupSchema(
+        id=1, created_at=datetime.datetime.now(), db_name=schema.db_name
+    )
 
 
 @router.post("", response_model=BackupSchema)
