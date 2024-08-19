@@ -7,6 +7,7 @@ env = Env()
 class Settings(BaseSettings):
     AUTH_API_HOST: str
     TENANT_API_TEMPLATE: str
+    BACKUP_DIR: str
     DBHOST: str
     NAMESPACE = "rfid-main"
     INSIDE_CLUSTER: bool
@@ -18,6 +19,8 @@ class Settings(BaseSettings):
         self.INSIDE_DOCKER = env.bool("INSIDE_DOCKER", default=True)
         if not self.INSIDE_DOCKER:
             env.read_env("../../env/backend.env")
+
+        self.BACKUP_DIR = env("BACKUP_DIR")
 
         self.AUTH_API_HOST = env("AUTH_API_HOST")
         self.PUBLIC_KEY = env("PUBLIC_KEY")

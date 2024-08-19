@@ -15,6 +15,7 @@ from backend.schemas.backups import (
 from backend.repositories import MQService, KubeAPIService, DBService
 from backend.schemas.users import AuthenticatedUser
 from backend.permissions import RequireStaffToken
+from backend.settings import Settings
 
 router = APIRouter(prefix="/v1/backups", tags=["backups"])
 
@@ -71,17 +72,21 @@ async def last_backups(
 
 
 @router.get("", response_model=List[str])
-async def list_by_db(user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())]):
-    return os.listdir("backups")
+async def list_by_db(
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+    settings: Annotated[Settings, Depends(Settings)],
+):
+    return os.listdir(settings.BACKUP_DIR)
 
 
 @router.get("/{db_name}", response_model=List[str])
 async def list_db_backups(
     db_name: str,
     user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+    settings: Annotated[Settings, Depends(Settings)],
 ):
     try:
-        return os.listdir(f"backups/{db_name}")
+        return os.listdir(f"{settings.BACKUP_DIR}/{db_name}")
     except FileNotFoundError:
         raise HTTPException(
             status_code=404,
