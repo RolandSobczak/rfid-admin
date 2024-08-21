@@ -6,7 +6,7 @@ sys.path.append("..")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import tenants, deployments, backups
+from backend.routers import tenants, deployments, backups, users
 from backend.settings import Settings
 
 settings = Settings()
@@ -15,6 +15,7 @@ app = FastAPI(description="RFIDIO - Admin API")
 app.include_router(tenants.router)
 app.include_router(deployments.router)
 app.include_router(backups.router)
+app.include_router(users.router)
 
 
 # origins = [
