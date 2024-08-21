@@ -51,6 +51,15 @@ async def create_scheduler(
     )
 
 
+@router.delete("/schedulers/{scheduler_name}", response_model=None, status_code=204)
+async def destroy_scheduler(
+    scheduler_name: str,
+    kube: Annotated[KubeAPIService, Depends(KubeAPIService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+):
+    kube.remove_cron_job(scheduler_name)
+
+
 @router.post("", response_model=BackupSchema)
 async def request_backup(
     schema: BackupCreationSchema,

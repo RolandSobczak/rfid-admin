@@ -351,5 +351,12 @@ class KubeAPIService(BaseService):
             )
         return out
 
+    def remove_cron_job(self, job_name: str):
+        api_instance = client.BatchV1Api()
+        api_response = api_instance.delete_namespaced_cron_job(
+            job_name,
+            self._settings.NAMESPACE,
+        )
+
     def get_deploy_backups(self) -> List[BackupSchedulerSchema]:
         pass
