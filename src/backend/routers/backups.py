@@ -45,6 +45,7 @@ async def create_scheduler(
 
     kube.schedule_backup(schema)
     return BackupSchedulerSchema(
+        scheduler_name=schema.scheduler_name,
         db_name=schema.app,
         schedule=schema.schedule,
     )

@@ -20,6 +20,8 @@ data:
     AGLRfWE6vgyE05eV7ie874ECAwEAAQ==
     -----END PUBLIC KEY-----
 
+  BACKUP_DIR: /var/backup
+
   # ENV
   ENV_TYPE: dev
   INSIDE_CLUSTER: "True" 
@@ -144,7 +146,7 @@ spec:
             - containerPort: 8000
           volumeMounts:
           - name: bak-data
-            mountPath: /var/backups
+            mountPath: /var/backup
 status: {}
 ---
 apiVersion: v1
@@ -226,7 +228,7 @@ spec:
                   key: RABBITMQ_DEFAULT_PASS
           volumeMounts:
           - name: bak-data
-            mountPath: /var/backups
+            mountPath: /var/backup
 status: {}
 ---
 apiVersion: v1
