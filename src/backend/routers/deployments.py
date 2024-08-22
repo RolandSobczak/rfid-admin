@@ -28,3 +28,12 @@ async def fetch_logs(
     user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
 ):
     return kube_serv.fetch_deploy_logs(deploy)
+
+
+@router.post("/{deploy}/restart")
+async def restart_deploy(
+    deploy: str,
+    kube_serv: Annotated[KubeAPIService, Depends(KubeAPIService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+):
+    return kube_serv.restart_deploy(deploy)

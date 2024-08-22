@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -360,3 +361,20 @@ class KubeAPIService(BaseService):
 
     def get_deploy_backups(self) -> List[BackupSchedulerSchema]:
         pass
+
+    def restart_deploy(self, name: str):
+        patch = {
+            "spec": {
+                "template": {
+                    "metadata": {
+                        "annotations": {
+                            "kubectl.kubernetes.io/restartedAt": datetime.datetime.utcnow().isoformat()
+                            + "Z"
+                        }
+                    }
+                }
+            }
+        }
+
+        api_instance = client.AppsV1Api()
+        api_instance.patch_namespaced_deployment(name, self._settings.NAMESPACE, patch)
