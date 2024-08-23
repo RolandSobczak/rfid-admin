@@ -193,23 +193,3 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: auth-ingress
-  namespace: rfid-main
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /auth-api(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: auth
-                port:
-                  number: 8000

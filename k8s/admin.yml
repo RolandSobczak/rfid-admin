@@ -64,7 +64,7 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-storage
   local:
-    path: /var/k8s/rfid-bak
+    path: "%BACKUP_DIR%"
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -72,7 +72,7 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - homeserver
+                - "%NODE%"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -249,23 +249,3 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: admin-ingress
-  namespace: rfid-main
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /admin-api(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: admin-api
-                port:
-                  number: 8000
