@@ -63,7 +63,7 @@ class KubeAPIService(BaseService):
                     value_from=client.V1EnvVarSource(
                         secret_key_ref=client.V1SecretKeySelector(
                             name="rabbit",
-                            key="RABBITMQ_DEFAULT_USER",
+                            key="RABBIT_USER",
                         )
                     ),
                 ),
@@ -72,7 +72,7 @@ class KubeAPIService(BaseService):
                     value_from=client.V1EnvVarSource(
                         secret_key_ref=client.V1SecretKeySelector(
                             name="rabbit",
-                            key="RABBITMQ_DEFAULT_PASS",
+                            key="RABBIT_PASSWORD",
                         )
                     ),
                 ),
