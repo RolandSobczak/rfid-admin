@@ -1,4 +1,4 @@
-REPO_ROOT="/home/rsobczak/code/rfid-kube"
+REPO_ROOT="/home/$USER/code/rfid-kube"
 #REPO_ROOT="."
 cd $REPO_ROOT
 

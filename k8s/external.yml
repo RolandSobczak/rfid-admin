@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: external-config
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 data:
   # SETTINGS
   SETTINGS_PATH: external.settings.base.Settings
@@ -24,7 +24,7 @@ data:
     JdshyHNA7X84mhM09YiKnU8CAwEAAQ==
     -----END PUBLIC KEY-----
   AUTH_API_HOST: http://auth:8000
-  TENANT_API_HOST_TEMPLATE: "http://tenant:8000/"
+  TENANT_API_HOST_TEMPLATE: "http://{{ tenant_slug }}:8000/"
   ENV_TYPE: dev
   LOG_LEVEL: INFO
   ALLOWED_ORIGINS: "*"
@@ -41,7 +41,7 @@ metadata:
   labels:
     app: external
   name: external
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   replicas: 1
   selector:
@@ -66,12 +66,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_USER
+                  key: RABBIT_USER
             - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_PASS
+                  key: RABBIT_PASSWORD
           envFrom:
             - configMapRef:
                 name: external-config
@@ -84,7 +84,7 @@ metadata:
   labels:
     app: external
   name: external
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 8000
@@ -95,23 +95,3 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: external-ingress
-  namespace: rfid-main
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /external-api(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: external
-                port:
-                  number: 8000

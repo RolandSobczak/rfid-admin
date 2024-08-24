@@ -1,4 +1,4 @@
-cd /home/rsobczak/code/rfid-kube-admin
+cd /home/$USER/code/rfid-kube-admin
 
 git_sha=$(git rev-parse HEAD)
 
@@ -10,8 +10,13 @@ fi
 rfid_front="localhost:32000/admin-front:${git_sha}"
 rfid_front_latest="localhost:32000/admin-front:latest"
 
-docker build -t $rfid_front  -t $rfid_front_latest -f Dockerfile --build-arg="AUTH_API_URL=http://192.168.0.92/auth-api/v1/" --build-arg="TENANT_API_URL=http://192.168.0.92/{{ tenant_slug }}/v1/" .
-docker build . --build-arg ADMIN_API_URL=http://192.168.1.2/admin-api/v1 --build-arg API_TIMEOUT=0 --build-arg BASE_URL=/admin/ -t $rfid_front  -t $rfid_front_latest
+docker build . \
+  --build-arg="ADMIN_API_URL=http://admin.server.local/v1" \
+  --build-arg="AUTH_API_URL=http://auth.server.local/v1" \
+  --build-arg BASE_URL=/admin/ \
+  -t $rfid_front \
+  -t $rfid_front_latest
+
 docker push $rfid_front
 docker push $rfid_front_latest
 

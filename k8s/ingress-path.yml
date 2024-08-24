@@ -1,0 +1,117 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-front-ingress
+  namespace: "%NAMESPACE%"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /admin(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: admin-front
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-ingress
+  namespace: "%NAMESPACE%"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /admin-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: admin-api
+                port:
+                  number: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: auth-ingress
+  namespace: "%NAMESPACE%"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /auth-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth
+                port:
+                  number: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: external-ingress
+  namespace: "%NAMESPACE%"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /external-api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: external
+                port:
+                  number: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: front-ingress
+  namespace: "%NAMESPACE%"
+  annotations:
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: front
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabbit-ingress
+  namespace: "%NAMESPACE%"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /rabbit-admin(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mq-management
+                port:
+                  number: 8000

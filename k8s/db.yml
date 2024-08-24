@@ -1,7 +1,8 @@
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: rfid-main-db
+  name: "%NAMESPACE%-db"
 spec:
   capacity:
     storage: 20Gi
@@ -11,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Delete
   storageClassName: local-storage
   local:
-    path: /var/k8s/rfid-main
+    path: "%DB_DIR%"
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -19,13 +20,13 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values:
-                - homeserver
+                - "%NODE%"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rfid-db
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   storageClassName: local-storage
   accessModes:
@@ -41,7 +42,7 @@ metadata:
   labels:
     app: postgres
   name: postgres
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   replicas: 1
   selector:
@@ -59,12 +60,12 @@ spec:
           persistentVolumeClaim:
             claimName: rfid-db
       containers:
-        - image: postgres:15.7
+        - image: postgres:%PG_VERSION%
           name: postgres
           resources: {}
           env:
             - name: POSTGRES_DB
-              value: "postgres"
+              value: "auth"
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
@@ -89,7 +90,7 @@ metadata:
   labels:
     app: postgres
   name: db
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 5432
@@ -108,7 +109,7 @@ metadata:
   labels:
     app: postgres
   name: db-np
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 5432

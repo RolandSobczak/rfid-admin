@@ -5,47 +5,47 @@ metadata:
   labels:
     app: rabbit
   name: rabbit
-  namespace: rfid-main
+namespace: "%NAMESPACE%"
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
+replicas: 1
+selector:
+  matchLabels:
+    app: rabbit
+strategy: {}
+template:
+  metadata:
+    creationTimestamp: null
+    labels:
       app: rabbit
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: rabbit
-    spec:
-      containers:
-        - image: rabbitmq:3.13.6-management
-          name: rabbit
-          resources: {}
-          env:
-            - name: RABBITMQ_DEFAULT_USER
-              valueFrom:
-                secretKeyRef:
-                  name: rabbit
-                  key: RABBITMQ_DEFAULT_USER
-            - name: RABBITMQ_DEFAULT_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: rabbit
-                  key: RABBITMQ_DEFAULT_PASS
-          ports:
-            - containerPort: 5432
-            - containerPort: 15672
+  spec:
+    containers:
+      - image: rabbitmq:3.13.6-management
+        name: rabbit
+        resources: {}
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbit
+                key: RABBIT_USER
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbit
+                key: RABBIT_PASSWORD
+        ports:
+          - containerPort: 5432
+          - containerPort: 15672
 status: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  creationTimestamp: null
-  labels:
-    app: rabbit
-  name: mq
-  namespace: rfid-main
+creationTimestamp: null
+labels:
+  app: rabbit
+name: mq
+namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 5672
@@ -64,7 +64,7 @@ metadata:
   labels:
     app: rabbit
   name: mq-management
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port:
@@ -75,23 +75,3 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: rabbit-ingress
-  namespace: rfid-main
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /rabbit-admin(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: mq-management
-                port:
-                  number: 8000
