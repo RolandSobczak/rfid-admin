@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tenant-config
+  namespace: "%NAMESPACE%"
+data:
+  # SETTINGS
+  SETTINGS_PATH: tenant.settings.base.Settings
+
+  # SECRET
+  PUBLIC_KEY: |
+    -----BEGIN PUBLIC KEY-----
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA41Z9WXaplX+o5Szxf2pV
+    2o7/dXDNwFoM7LJAdNno1pYYZUtph/5ickj3Pv6/MHmDIAg3bDmgKZyNC+mER7uz
+    +J0jakNkKSjEbpNcDxq1WHBYBoGRZD2JNVpnTMimgCPpyl5tESFHHi1ro6Yw2F3G
+    w2FWqK0EEoZLueGsSqizK1aIJM8ChJHoIcG5SZLy/QCBE1jlxUGkW4Ndho87TGWk
+    JHXx+iP2+Y0bBHkBjE8WkhZovRxtbv3nO5kL6eTgzyRlsZ7VttKkng7XGmwQr5aw
+    ZRE9L5HIvn5mznImBfS2SvTFaygs2E09SmbOAniQdqbxLgozBhaoeqXWyQgDmjX9
+    xOlxbW7vHqOniGLXtSLeKY10brA6wMe4tq7v+x311a/IMKZpjuk6DwG4QnLFQnDc
+    6WXZRwAZtSsheXpo5gykKGE+D1SA4P5enyMQLy2P65h+8PhhFdtEJFVt8go9LWf1
+    mAQxZfSFdWXV+k4S2f8nwZifSjTCZGTocbHU6pPrnb8bphbK0HsVjSyFXL8EmkKm
+    O8J8uPhWf1THpMv1gWUz1Fs0IJeKOde65yg6227o8wRrNaCTwOt476HLS4WEVpAU
+    J3q8VzXSPIoQ4k0vDW6kkJuNtxr1tjX2rtBJjqFOFGGh3QcNuEPaZ0KNdvNCEzz7
+    AGLRfWE6vgyE05eV7ie874ECAwEAAQ==
+    -----END PUBLIC KEY-----
+
+  # TENANT
+
+  # AUTH API
+  AUTH_API_HOST: http://auth:8000
+
+  # ENV
+  ENV_TYPE: prod
+
+  # Logging
+  LOG_LEVEL: DEBUG
+
+  # POSTGRES
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+
+  # CORS
+  ALLOWED_ORIGINS: "*"
+  ALLOW_CREDENTIALS: "True"
+  ALLOWED_METHODS: "*"
+  ALLOWED_HEADERS: "*"
+
+  # PATH
+  ROOT_PATH: /tenant-api
+
+  RABBIT_HOST: mq
+
+  # EXTERNAL
+  NOTYFICATION_ATTEMPTS: "1,3"
