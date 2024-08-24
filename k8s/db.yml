@@ -26,7 +26,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rfid-db
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   storageClassName: local-storage
   accessModes:
@@ -42,7 +42,7 @@ metadata:
   labels:
     app: postgres
   name: postgres
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   replicas: 1
   selector:
@@ -90,7 +90,7 @@ metadata:
   labels:
     app: postgres
   name: db
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 5432
@@ -109,7 +109,7 @@ metadata:
   labels:
     app: postgres
   name: db-np
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 5432

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: admin-config
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 data:
   PUBLIC_KEY: |
     -----BEGIN PUBLIC KEY-----
@@ -78,7 +78,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rfid-bak
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   storageClassName: local-storage
   accessModes:
@@ -94,7 +94,7 @@ metadata:
   labels:
     app: admin-api 
   name: admin 
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   replicas: 1
   selector:
@@ -136,12 +136,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_USER
+                  key: RABBIT_USER
             - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_PASS
+                  key: RABBIT_PASSWORD
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -153,7 +153,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: admin-worker-config
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 data:
   # Env
   ENV_TYPE: dev
@@ -180,7 +180,7 @@ metadata:
   labels:
     app: admin-worker 
   name: admin-worker
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   replicas: 1
   selector:
@@ -220,12 +220,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_USER
+                  key: RABBIT_USER
             - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_PASS
+                  key: RABBIT_PASSWORD
           volumeMounts:
           - name: bak-data
             mountPath: /var/backup
@@ -238,7 +238,7 @@ metadata:
   labels:
     app: admin-api 
   name: admin-api
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 8000

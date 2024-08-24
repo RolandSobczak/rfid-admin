@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: auth-config
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 data:
   SETTINGS_PATH: "auth.settings.base.Settings"
   PUBLIC_KEY: |
@@ -129,7 +129,7 @@ metadata:
   labels:
     app: auth
   name: auth
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   replicas: 1
   selector:
@@ -160,16 +160,16 @@ spec:
                 secretKeyRef:
                   name: db
                   key: POSTGRES_PASSWORD
-            - name: RABBIT_USER
+            - name: RABBIT_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_USER
+                  key: RABBIT_USER
             - name: RABBIT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: rabbit
-                  key: RABBITMQ_DEFAULT_PASS
+                  key: RABBIT_PASSWORD
           envFrom:
             - configMapRef:
                 name: auth-config
@@ -182,7 +182,7 @@ metadata:
   labels:
     app: auth
   name: auth
-  namespace: rfid-main
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 8000
