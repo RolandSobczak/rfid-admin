@@ -1,7 +1,16 @@
-from shared.settings import BaseSettings
+from typing import Optional
+from enum import Enum
+
 from environs import Env
 
+from shared.settings import BaseSettings
+
 env = Env()
+
+
+class Routing(Enum):
+    DOMAIN = "DOMAIN"
+    PATH = "PATH"
 
 
 class Settings(BaseSettings):
@@ -14,6 +23,8 @@ class Settings(BaseSettings):
     INSIDE_DOCKER: bool
     RABBIT_CONFIG: dict
     POSTGRES_CONFIG: dict
+    ROUTING: Routing
+    DOMAIN: Optional[str]
 
     def _load_data(self):
         self.INSIDE_DOCKER = env.bool("INSIDE_DOCKER", default=True)
@@ -21,6 +32,8 @@ class Settings(BaseSettings):
             env.read_env("../../env/backend.env")
 
         self.BACKUP_DIR = env("BACKUP_DIR")
+        self.ROUTING = env.enum("ROUTING", type=Routing, ignore_case=True)
+        self.DOMAIN = env("DOMAIN", None)
 
         self.AUTH_API_HOST = env("AUTH_API_HOST")
         self.PUBLIC_KEY = env("PUBLIC_KEY")
