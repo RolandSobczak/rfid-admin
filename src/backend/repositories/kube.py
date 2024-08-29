@@ -286,31 +286,80 @@ class KubeAPIService(BaseService):
         return str(val)
 
     def schedule_backup(self, schema: BackupSchedulerSchema):
+        metadata = client.V1ObjectMeta(
+            name=f"{schema.app}-backup-{str(uuid.uuid4())}",
+            namespace=self._settings.NAMESPACE,
+            labels={
+                "app": "admin-worker",
+                "task": "backup",
+                "db": schema.app,
+            },
+        )
+        template = client.V1PodTemplateSpec(
+            metadata=metadata,
+            spec=client.V1PodSpec(
+                restart_policy="Never",
+                volumes=[
+                    client.V1Volume(
+                        name="bak-pvc",
+                        persistent_volume_claim=client.V1PersistentVolumeClaimVolumeSource(
+                            claim_name="rfid-bak"
+                        ),
+                    )
+                ],
+                containers=[
+                    client.V1Container(
+                        name="sender",
+                        image="localhost:32000/rfidio-admin-worker:latest",
+                        image_pull_policy="Always",
+                        env_from=[
+                            client.V1EnvFromSource(
+                                config_map_ref=client.V1ConfigMapEnvSource(
+                                    "admin-worker-config"
+                                )
+                            )
+                        ],
+                        env=[
+                            client.V1EnvVar(
+                                name="DB_NAME",
+                                value=schema.app,
+                            ),
+                            client.V1EnvVar(
+                                name="POSTGRES_USER",
+                                value_from=client.V1EnvVarSource(
+                                    secret_key_ref=client.V1SecretKeySelector(
+                                        name="db",
+                                        key="POSTGRES_USER",
+                                    )
+                                ),
+                            ),
+                            client.V1EnvVar(
+                                name="POSTGRES_PASSWORD",
+                                value_from=client.V1EnvVarSource(
+                                    secret_key_ref=client.V1SecretKeySelector(
+                                        name="db",
+                                        key="POSTGRES_PASSWORD",
+                                    )
+                                ),
+                            ),
+                        ],
+                        volume_mounts=[
+                            client.V1VolumeMount(
+                                name="bak-pvc", mount_path="/var/backup"
+                            )
+                        ],
+                    )
+                ],
+            ),
+        )
+        spec = client.V1JobSpec(
+            backoff_limit=3, completions=1, parallelism=1, template=template
+        )
         job_template = client.V1JobTemplateSpec(
             metadata=client.V1ObjectMeta(
                 namespace=self._settings.NAMESPACE,
             ),
-            spec=client.V1JobSpec(
-                template=client.V1PodTemplateSpec(
-                    metadata=client.V1ObjectMeta(namespace=self._settings.NAMESPACE),
-                    spec=client.V1PodSpec(
-                        restart_policy="OnFailure",
-                        containers=[
-                            client.V1Container(
-                                name="sender",
-                                image="localhost:32000/rfidio-mq-sender:latest",
-                                image_pull_policy="Always",
-                                env=[
-                                    client.V1EnvVar(
-                                        name="DB_NAME",
-                                        value=schema.app,
-                                    )
-                                ],
-                            )
-                        ],
-                    ),
-                )
-            ),
+            spec=spec,
         )
 
         cronjob = client.V1CronJob(
