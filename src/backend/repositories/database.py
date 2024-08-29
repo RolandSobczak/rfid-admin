@@ -1,4 +1,5 @@
 from typing import Optional, List
+
 from fastapi import HTTPException
 
 from sqlalchemy import create_engine, text
@@ -61,6 +62,22 @@ class DBService(BaseService):
                     return []
 
                 return [row[0] for row in res]
+
+    def check_db_exists(self, db_name: str) -> bool:
+        engine = create_engine(self._settings.DBHOST, echo=True)
+
+        with engine.connect() as conn:
+            with conn.begin():
+                stmt = f"""
+                        SELECT datname
+                        FROM pg_database
+                        WHERE datistemplate=false AND datname=:db_name
+                        """
+                res = conn.execute(text(stmt), {"db_name": db_name}).fetchone()
+                if res is None:
+                    return False
+
+                return True
 
     def get_tenant_by_id(self, tenant_id: int) -> Optional[TenantSchema]:
         engine = create_engine(self._settings.DBHOST + "auth", echo=True)
