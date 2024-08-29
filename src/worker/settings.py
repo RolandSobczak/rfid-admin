@@ -7,8 +7,8 @@ env = Env()
 
 class Settings(BaseSettings):
     POSTGRES_CONFIG: str
-    RABBIT_CONFIG: str
     BACKUP_DIR: str
+    DB_NAME: str
 
     def _load_data(self):
         self.POSTGRES_CONFIG = {
@@ -18,10 +18,5 @@ class Settings(BaseSettings):
             "PORT": env("POSTGRES_PORT", default="5432"),
             "DB": env("POSTGRES_DB"),
         }
-        self.RABBIT_CONFIG = {
-            "HOST": env("RABBIT_HOST"),
-            "PORT": env("RABBIT_PORT"),
-            "USER": env("RABBIT_USER"),
-            "PASSWORD": env("RABBIT_PASSWORD"),
-        }
         self.BACKUP_DIR = env("BACKUP_DIR", "/var/backup")
+        self.DB_NAME = env("DB_NAME")

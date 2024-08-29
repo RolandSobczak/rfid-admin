@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 import datetime
-import json
 import os
-
-import gzip
-
-import pika
+import sys
 
 BACKUP_PATH = "/var/backup/"
 
@@ -36,40 +32,13 @@ def backup_db(db_name: str, filename: str):
             print("BACKUP_CREATED", flush=True)
 
 
-def callback(ch, method, properties, body):
-    print("NEW TASK RECEIVED", flush=True)
-    if "backups" in method.routing_key:
-        req = json.loads(body)
-        os.makedirs(BACKUP_PATH + req["db_name"], exist_ok=True)
-        backup_db(
-            req["db_name"],
-            filename=f"{BACKUP_PATH}{req['db_name']}/{str(req['created_at'])}.gz",
-        )
-
-
 def main():
-    credentials = pika.PlainCredentials(
-        settings.RABBIT_CONFIG["USER"], settings.RABBIT_CONFIG["PASSWORD"]
+    current_time = datetime.datetime.now()
+    os.makedirs(BACKUP_PATH + settings.DB_NAME, exist_ok=True)
+    backup_db(
+        settings.DB_NAME,
+        filename=f"{BACKUP_PATH}{settings.DB_NAME}/{current_time.strftime('%Y-%m-%dT%H:%M:%S')}.gz",
     )
-    parameters = pika.ConnectionParameters(
-        settings.RABBIT_CONFIG["HOST"], settings.RABBIT_CONFIG["PORT"], "/", credentials
-    )
-
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
-    channel.basic_qos(prefetch_count=1)
-
-    channel.exchange_declare(exchange="backups", exchange_type="topic")
-
-    result = channel.queue_declare("", exclusive=True)
-    queue_name = result.method.queue
-    channel.queue_bind(exchange="backups", queue=queue_name, routing_key="admin.*")
-
-    print("WORKER CONNECTED", flush=True)
-
-    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
-
-    channel.start_consuming()
 
 
 if __name__ == "__main__":

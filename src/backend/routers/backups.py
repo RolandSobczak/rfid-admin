@@ -63,10 +63,10 @@ async def destroy_scheduler(
 @router.post("", response_model=BackupSchema)
 async def request_backup(
     schema: BackupCreationSchema,
-    mq: Annotated[MQService, Depends(MQService)],
+    kube: Annotated[KubeAPIService, Depends(KubeAPIService)],
     user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
 ):
-    mq.request_backup(schema.db_name)
+    kube.create_backup(schema.db_name)
     return BackupSchema(
         id=1, created_at=datetime.datetime.now(), db_name=schema.db_name
     )
