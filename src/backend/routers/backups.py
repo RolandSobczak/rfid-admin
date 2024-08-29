@@ -89,6 +89,14 @@ async def list_by_db(
     return os.listdir(settings.BACKUP_DIR)
 
 
+@router.get("/databases")  # , response_model=List[BackupSchema])
+async def list_schedulers(
+    db: Annotated[DBService, Depends(DBService)],
+    user: Annotated[AuthenticatedUser, Depends(RequireStaffToken())],
+):
+    return db.get_db_list()
+
+
 @router.get("/{db_name}", response_model=List[str])
 async def list_db_backups(
     db_name: str,

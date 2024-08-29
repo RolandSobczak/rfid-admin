@@ -46,6 +46,22 @@ class DBService(BaseService):
         if database_exists(self._settings.DBHOST + db_name):
             drop_database(self._settings.DBHOST + db_name)
 
+    def get_db_list(self) -> List[str]:
+        engine = create_engine(self._settings.DBHOST, echo=True)
+
+        with engine.connect() as conn:
+            with conn.begin():
+                stmt = """
+                        SELECT datname
+                        FROM pg_database
+                        WHERE datistemplate = false;
+                        """
+                res = conn.execute(text(stmt))
+                if res is None:
+                    return []
+
+                return [row[0] for row in res]
+
     def get_tenant_by_id(self, tenant_id: int) -> Optional[TenantSchema]:
         engine = create_engine(self._settings.DBHOST + "auth", echo=True)
 

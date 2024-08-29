@@ -180,7 +180,9 @@ class KubeAPIService(BaseService):
 
     def list_raw_deployments(self) -> List[dict]:
         api_instance = client.AppsV1Api()
-        api_response = api_instance.list_namespaced_deployment(namespace="rfid-main")
+        api_response = api_instance.list_namespaced_deployment(
+            namespace=self._settings.NAMESPACE
+        )
         return [
             {"name": deploy.metadata.name, "labels": deploy.metadata.labels}
             for deploy in api_response.items
