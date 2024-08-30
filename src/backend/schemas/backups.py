@@ -35,6 +35,17 @@ class BackupSchedulerCreationSchema(BaseModel):
 
         raise ValueError("Database with provided name does not exist.")
 
+    @field_validator("scheduler_name")
+    @classmethod
+    def validate_scheduer_exists(cls, v: str):
+        from backend.repositories import KubeAPIService
+
+        kube_api = KubeAPIService()
+        if not kube_api.check_scheduler_exists(v):
+            return v
+
+        raise ValueError("Scheduler with provided name already exists.")
+
 
 class BackupSchedulerSchema(BaseModel):
     scheduler_name: str

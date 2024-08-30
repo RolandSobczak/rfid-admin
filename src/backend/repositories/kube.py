@@ -2,7 +2,7 @@ import uuid
 import datetime
 from typing import List
 from kubernetes import client, config
-from kubernetes.client.rest import ApiException
+from kubernetes.client.exceptions import ApiException
 
 from backend.schemas.users import UserCreationModel, TenantProfileSchema
 from backend.schemas.tenants import TenantSchema
@@ -352,7 +352,7 @@ class KubeAPIService(BaseService):
                         ],
                     )
                 ],
-            ),
+           ),
         )
         spec = client.V1JobSpec(
             backoff_limit=3, completions=1, parallelism=1, template=template
@@ -505,3 +505,19 @@ class KubeAPIService(BaseService):
         api_res = api_instance.create_namespaced_job(
             namespace="rfid-dev", body=client.V1Job(metadata=metadata, spec=spec)
         )
+
+    def check_scheduler_exists(self, scheduler_name: str) -> bool:
+        print("SCHEDULER EXISTS", scheduler_name)
+        try:
+            api_instance = client.BatchV1Api()
+            api_response = api_instance.read_namespaced_cron_job_status(
+                scheduler_name,
+                self._settings.NAMESPACE,
+            )
+            return True
+        except:
+            return False
+
+        # except ApiException as e:
+            # print(e)
+            # return False
