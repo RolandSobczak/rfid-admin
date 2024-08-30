@@ -1,4 +1,4 @@
-cd /home/$USER/code/RFIDIO-Frontend
+cd $HOME/code/RFIDIO-Frontend
 
 git_sha=$(git rev-parse HEAD)
 
