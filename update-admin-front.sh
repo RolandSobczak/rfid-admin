@@ -1,4 +1,4 @@
-cd /home/$USER/code/rfid-kube-admin
+cd $HOME/code/rfid-kube-admin
 
 git_sha=$(git rev-parse HEAD)
 

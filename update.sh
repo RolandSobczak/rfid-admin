@@ -1,4 +1,4 @@
-REPO_ROOT="/home/$USER/code/RFIDIO-Backend"
+REPO_ROOT="$HOME/code/RFIDIO-Backend"
 cd $REPO_ROOT
 
 prev_git_sha=$(git rev-parse HEAD)
