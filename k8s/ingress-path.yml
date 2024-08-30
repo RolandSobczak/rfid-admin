@@ -42,7 +42,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: auth-ingress
-  namespace: "%NAMESPACE%"
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
@@ -95,23 +94,3 @@ spec:
                 name: front
                 port:
                   number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: rabbit-ingress
-  namespace: "%NAMESPACE%"
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /rabbit-admin(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: mq-management
-                port:
-                  number: 8000
