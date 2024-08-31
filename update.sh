@@ -39,9 +39,9 @@ docker build -t $rfid_external -t $rfid_external_latest -f docker/external/exter
 docker push $rfid_external
 docker push $rfid_external_latest
 
- kubectl set image deployments --namespace=rfid-main --selector="app=auth" auth=$rfid_auth
- kubectl set image deployments --namespace=rfid-main --all tenant=$rfid_tenant
- kubectl set image deployments --namespace=rfid-main --selector="app=external" external=$rfid_external
+kubectl set image deployments --namespace=rfid-dev --selector="app=auth" auth=$rfid_auth
+kubectl set image deployments --namespace=rfid-dev --all tenant=$rfid_tenant
+kubectl set image deployments --namespace=rfid-dev --selector="app=external" external=$rfid_external
 
 
 cd -

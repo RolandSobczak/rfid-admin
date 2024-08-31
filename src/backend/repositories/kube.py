@@ -8,6 +8,7 @@ from backend.schemas.users import UserCreationModel, TenantProfileSchema
 from backend.schemas.tenants import TenantSchema
 from backend.schemas.deployments import DeploymentSchema
 from backend.schemas.backups import BackupSchedulerSchema, BackupSchedulerCreationSchema
+from backend.settings import Routing
 from .base import BaseService
 
 
@@ -58,11 +59,11 @@ class KubeAPIService(BaseService):
                     ),
                 ),
                 client.V1EnvVar(
-                    name="RABBIT_USER",
+                    name="RABBIT_USERNAME",
                     value_from=client.V1EnvVarSource(
                         secret_key_ref=client.V1SecretKeySelector(
                             name="rabbit",
-                            key="RABBITMQ_DEFAULT_USER",
+                            key="RABBIT_USER",
                         )
                     ),
                 ),
@@ -71,7 +72,7 @@ class KubeAPIService(BaseService):
                     value_from=client.V1EnvVarSource(
                         secret_key_ref=client.V1SecretKeySelector(
                             name="rabbit",
-                            key="RABBITMQ_DEFAULT_PASS",
+                            key="RABBIT_PASSWORD",
                         )
                     ),
                 ),
@@ -123,6 +124,51 @@ class KubeAPIService(BaseService):
         )
 
     def _create_ingress(self, networking_v1_api, tenant: TenantProfileSchema):
+        rule: client.V1IngressRule
+
+        if self._settings.ROUTING == Routing.DOMAIN:
+            if self._settings.DOMAIN == None:
+                raise RuntimeError("Domain need to be provided when routing = domain.")
+
+            rule = client.V1IngressRule(
+                host="api." + self._settings.DOMAIN,
+                http=client.V1HTTPIngressRuleValue(
+                    paths=[
+                        client.V1HTTPIngressPath(
+                            path=f"/{tenant.slug}(/|$)(.*)",
+                            path_type="ImplementationSpecific",
+                            backend=client.V1IngressBackend(
+                                service=client.V1IngressServiceBackend(
+                                    port=client.V1ServiceBackendPort(
+                                        number=8000,
+                                    ),
+                                    name=tenant.slug,
+                                )
+                            ),
+                        )
+                    ]
+                ),
+            )
+        else:
+            rule = client.V1IngressRule(
+                http=client.V1HTTPIngressRuleValue(
+                    paths=[
+                        client.V1HTTPIngressPath(
+                            path=f"/{tenant.slug}(/|$)(.*)",
+                            path_type="ImplementationSpecific",
+                            backend=client.V1IngressBackend(
+                                service=client.V1IngressServiceBackend(
+                                    port=client.V1ServiceBackendPort(
+                                        number=8000,
+                                    ),
+                                    name=tenant.slug,
+                                )
+                            ),
+                        )
+                    ]
+                ),
+            )
+
         body = client.V1Ingress(
             api_version="networking.k8s.io/v1",
             kind="Ingress",
@@ -133,28 +179,7 @@ class KubeAPIService(BaseService):
                     "nginx.ingress.kubernetes.io/use-regex": "true",
                 },
             ),
-            spec=client.V1IngressSpec(
-                rules=[
-                    client.V1IngressRule(
-                        http=client.V1HTTPIngressRuleValue(
-                            paths=[
-                                client.V1HTTPIngressPath(
-                                    path=f"/{tenant.slug}(/|$)(.*)",
-                                    path_type="ImplementationSpecific",
-                                    backend=client.V1IngressBackend(
-                                        service=client.V1IngressServiceBackend(
-                                            port=client.V1ServiceBackendPort(
-                                                number=8000,
-                                            ),
-                                            name=tenant.slug,
-                                        )
-                                    ),
-                                )
-                            ]
-                        ),
-                    )
-                ]
-            ),
+            spec=client.V1IngressSpec(rules=[rule]),
         )
         networking_v1_api.create_namespaced_ingress(
             namespace=self._settings.NAMESPACE, body=body
