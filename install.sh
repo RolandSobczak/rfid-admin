@@ -11,13 +11,14 @@ alias k=kubectl
 
 NODE='pop-os'
 
-#k create namespace "$NAMESPACE"
+k create namespace "$NAMESPACE"
 
 k create secret generic -n "$NAMESPACE" --from-env-file=env/postgres.env db
 k create secret generic -n "$NAMESPACE" --from-env-file=env/rabbit.env rabbit
 
 sed -e "s|%PG_VERSION%|${PG_VERSION}|g" \
     -e "s|%DB_DIR%|${DB_DIR}|g" \
+    -e "s|%STORAGE_CLASS%|${STORAGE_CLASS}|g" \
     -e "s|%NAMESPACE%|${NAMESPACE}|g" \
     -e "s|%NODE%|${NODE}|g" \
     k8s/db.yml > "$BUILD_DIR/db.yml"
@@ -32,6 +33,7 @@ sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
 
 sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
     -e "s|%NAMESPACE%|${NAMESPACE}|g" \
+    -e "s|%STORAGE_CLASS%|${STORAGE_CLASS}|g" \
     -e "s|%NODE%|${NODE}|g" \
     k8s/admin.yml > "$BUILD_DIR/admin.yml"
 
