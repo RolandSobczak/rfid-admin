@@ -31,6 +31,24 @@ class KubeAPIService(BaseService):
                     config_map_ref=client.V1ConfigMapEnvSource("tenant-config")
                 )
             ],
+            livenesse_probe=client.V1Probe(
+                http_get=client.V1GetAcction(
+                    path="/helthcheck",
+                    port="8000",
+                ),
+                initial_second=5,
+                period_seconds=10,
+                failure_threshold=3,
+            ),
+            startup_probe=client.V1Probe(
+                http_get=client.V1GetAcction(
+                    path="/helthcheck",
+                    port="8000",
+                ),
+                initial_second=5,
+                period_seconds=10,
+                failure_threshold=3,
+            ),
             env=[
                 client.V1EnvVar(
                     name="POSTGRES_DB",
@@ -377,7 +395,7 @@ class KubeAPIService(BaseService):
                         ],
                     )
                 ],
-           ),
+            ),
         )
         spec = client.V1JobSpec(
             backoff_limit=3, completions=1, parallelism=1, template=template
@@ -544,5 +562,5 @@ class KubeAPIService(BaseService):
             return False
 
         # except ApiException as e:
-            # print(e)
-            # return False
+        # print(e)
+        # return False

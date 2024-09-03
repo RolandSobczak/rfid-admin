@@ -57,12 +57,13 @@ metadata:
   name: rfid-bak
   namespace: "%NAMESPACE%"
 spec:
+  volumeName: "%VOLUME_NAME%"
   storageClassName: "%STORAGE_CLASS%"
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
+      storage: "%STORAGE_SIZE%"
 ---
 apiVersion: apps/v1
 kind: Deployment

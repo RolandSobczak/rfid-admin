@@ -18,7 +18,9 @@ k create secret generic -n "$NAMESPACE" --from-env-file=env/rabbit.env rabbit
 
 sed -e "s|%PG_VERSION%|${PG_VERSION}|g" \
     -e "s|%DB_DIR%|${DB_DIR}|g" \
-    -e "s|%STORAGE_CLASS%|${STORAGE_CLASS}|g" \
+    -e "s|%STORAGE_CLASS%|${POSTGRES_STORAGE_CLASS}|g" \
+    -e "s|%VOLUME_NAME%|${POSTGRES_VOLUME_NAME}|g" \
+    -e "s|%STORAGE_SIZE%|${POSTGRES_STORAGE_SIZE}|g" \
     -e "s|%NAMESPACE%|${NAMESPACE}|g" \
     -e "s|%NODE%|${NODE}|g" \
     k8s/db.yml > "$BUILD_DIR/db.yml"
@@ -33,7 +35,9 @@ sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
 
 sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
     -e "s|%NAMESPACE%|${NAMESPACE}|g" \
-    -e "s|%STORAGE_CLASS%|${STORAGE_CLASS}|g" \
+    -e "s|%STORAGE_CLASS%|${BACKUP_STORAGE_CLASS}|g" \
+    -e "s|%VOLUME_NAME%|${BACKUP_VOLUME_NAME}|g" \
+    -e "s|%STORAGE_SIZE%|${BACKUP_STORAGE_SIZE}|g" \
     -e "s|%NODE%|${NODE}|g" \
     k8s/admin.yml > "$BUILD_DIR/admin.yml"
 
