@@ -176,13 +176,13 @@ spec:
                 name: auth-config
           livenessProbe:
             httpGet:
-              path: /healthy
+              path: /healthcheck
               port: http
             failureThreshold: 3
             periodSeconds: 10
           startupProbe:
             httpGet:
-              path: /healthy
+              path: /healthcheck
               port: http
             failureThreshold: 4
             periodSeconds: 30

@@ -4,12 +4,13 @@ metadata:
   name: rfid-db
   namespace: "%NAMESPACE%"
 spec:
+  volumeName: "%VOLUME_NAME%"
   storageClassName: "%STORAGE_CLASS%"
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
+      storage: "%STORAGE_SIZE%"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -60,17 +61,19 @@ spec:
           livenessProbe:
             exec:
               command:
-              - psql
-              - "-U"
-              - "$$POSTGRES_USER"
-            initialDelaySeconds: 3
+              - "sh"
+              - "-c"
+              - "PGPASSWORD=$$POSTGRES_PASSWORD psql -U $$POSTGRES_USER -h 127.0.0.1"
+            initialDelaySeconds: 20
+            failureThreshold: 6
             periodSeconds: 10
           startupProbe:
             exec:
               command:
-              - psql
-              - "-U"
-              - "$$POSTGRES_USER"
+              - "sh"
+              - "-c"
+              - "PGPASSWORD=$$POSTGRES_PASSWORD psql -U $$POSTGRES_USER -h 127.0.0.1"
+            initialDelaySeconds: 20
             failureThreshold: 6
             periodSeconds: 10
 status: {}
