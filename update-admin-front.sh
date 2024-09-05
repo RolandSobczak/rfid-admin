@@ -20,6 +20,6 @@ docker build . \
 docker push $rfid_front
 docker push $rfid_front_latest
 
- kubectl set image deployments --namespace=rfid-main --selector="app=admin-front" admin-front=$rfid_front
+ kubectl set image deployments --namespace=rfid-dev --selector="app=admin-front" admin-front=$rfid_front
 
 cd -
