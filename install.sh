@@ -13,6 +13,11 @@ k create namespace "$NAMESPACE"
 
 k create secret generic -n "$NAMESPACE" --from-env-file=env/postgres.env db
 k create secret generic -n "$NAMESPACE" --from-env-file=env/rabbit.env rabbit
+kubectl create secret docker-registry regcred \
+  -n "$NAMESPACE" \
+  --docker-server="$REGISTRY_HOST" \
+  --docker-username="$REGISTRY_USERNAME" \
+  --docker-password="$REGISTRY_PASSWORD"
 
 sed -e "s|%PG_VERSION%|${PG_VERSION}|g" \
     -e "s|%DB_DIR%|${DB_DIR}|g" \

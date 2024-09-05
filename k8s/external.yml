@@ -54,6 +54,8 @@ spec:
       labels:
         app: external
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - image: "%REGISTRY%/rfidio-external:latest"
           imagePullPolicy: Always

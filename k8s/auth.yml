@@ -142,6 +142,8 @@ spec:
       labels:
         app: auth
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - image: "%REGISTRY%/rfidio-auth:latest"
           imagePullPolicy: Always

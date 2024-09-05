@@ -18,6 +18,8 @@ spec:
       labels:
         app: front
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - image: "%REGISTRY%/rfidio-front:latest"
           imagePullPolicy: Always

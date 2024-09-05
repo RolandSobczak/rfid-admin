@@ -91,6 +91,8 @@ spec:
         - name: bak-data
           persistentVolumeClaim:
             claimName: rfid-bak
+      imagePullSecrets:
+        - name: regcred
       containers:
         - image: "%REGISTRY%/rfidio-admin:latest"
           imagePullPolicy: Always
