@@ -19,7 +19,7 @@ spec:
         app: front
     spec:
       containers:
-        - image: localhost:32000/rfidio-front:latest
+        - image: "%REGISTRY%/rfidio-front:latest"
           imagePullPolicy: Always
           name: front
           resources: {}

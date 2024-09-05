@@ -19,7 +19,7 @@ spec:
         app: admin-front
     spec:
       containers:
-        - image: localhost:32000/admin-front:latest
+        - image: "%REGISTRY%/admin-front:latest"
           imagePullPolicy: Always
           name: admin-front
           resources: {}

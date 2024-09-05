@@ -92,7 +92,7 @@ spec:
           persistentVolumeClaim:
             claimName: rfid-bak
       containers:
-        - image: localhost:32000/rfidio-admin:latest 
+        - image: "%REGISTRY%/rfidio-admin:latest"
           imagePullPolicy: Always
           name: admin-api
           resources: {}

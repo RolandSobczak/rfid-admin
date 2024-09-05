@@ -55,7 +55,7 @@ spec:
         app: external
     spec:
       containers:
-        - image: localhost:32000/rfidio-external:latest
+        - image: "%REGISTRY%/rfidio-external:latest"
           imagePullPolicy: Always
           name: external
           resources: {}

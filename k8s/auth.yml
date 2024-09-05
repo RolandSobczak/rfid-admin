@@ -143,7 +143,7 @@ spec:
         app: auth
     spec:
       containers:
-        - image: localhost:32000/rfidio-auth:latest
+        - image: "%REGISTRY%/rfidio-auth:latest"
           imagePullPolicy: Always
           name: auth
           resources: {}
