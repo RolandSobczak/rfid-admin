@@ -2,8 +2,9 @@ name: ci
 
 on:
   push:
-    - main
-    - develop
+    branches:
+      - main
+      - develop
 
 jobs:
   docker:
