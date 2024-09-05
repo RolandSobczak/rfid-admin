@@ -35,5 +35,5 @@ jobs:
           file: ./docker/backend/Dockerfile
           push: true
           tags: |
-            ${{ vars.REGISTRY_HOST }}/rfid-admin/rfid-admin-api:latest
-            ${{ vars.REGISTRY_HOST }}/rfid-admin/rfid-admin-api:${{ github.sha }}
+            ${{ vars.DOCKER_REPO }}/rfid-admin-api:latest
+            ${{ vars.DOCKER_REPO }}/rfid-admin-api:${{ github.sha }}
