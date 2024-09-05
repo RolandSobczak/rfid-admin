@@ -94,7 +94,7 @@ spec:
       imagePullSecrets:
         - name: regcred
       containers:
-        - image: "%REGISTRY%/rfidio-admin:latest"
+        - image: "%REGISTRY%/rfid-admin-api:latest"
           imagePullPolicy: Always
           name: admin-api
           resources: {}
