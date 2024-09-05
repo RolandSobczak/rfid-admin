@@ -13,6 +13,8 @@ k create namespace "$NAMESPACE"
 
 k create secret generic -n "$NAMESPACE" --from-env-file=env/postgres.env db
 k create secret generic -n "$NAMESPACE" --from-env-file=env/rabbit.env rabbit
+
+source env/docker.env
 kubectl create secret docker-registry regcred \
   -n "$NAMESPACE" \
   --docker-server="$REGISTRY_HOST" \
