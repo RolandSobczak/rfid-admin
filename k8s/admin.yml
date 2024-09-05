@@ -21,6 +21,8 @@ data:
     -----END PUBLIC KEY-----
 
   BACKUP_DIR: /var/backup
+  ROUTING: DOMAIN
+  DOMAIN: "server.local"
 
   # ENV
   ENV_TYPE: dev
@@ -52,40 +54,18 @@ data:
   RABBIT_PORT: "5672"
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: "%NAMESPACE%-bak"
-spec:
-  capacity:
-    storage: 20Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  storageClassName: local-storage
-  local:
-    path: "%BACKUP_DIR%"
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - "%NODE%"
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rfid-bak
   namespace: "%NAMESPACE%"
 spec:
-  storageClassName: local-storage
+  volumeName: "%VOLUME_NAME%"
+  storageClassName: "%STORAGE_CLASS%"
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
+      storage: "%STORAGE_SIZE%"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -168,6 +148,8 @@ data:
   POSTGRES_HOST: db
   POSTGRES_PORT: "5432"
   POSTGRES_DB: admin
+  ROUTING: "%ROUTING%"
+  DOMAIN: "%DOMAIN%"
 
   #MQ
   RABBIT_HOST: mq

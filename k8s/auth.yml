@@ -148,7 +148,8 @@ spec:
           name: auth
           resources: {}
           ports:
-            - containerPort: 8000
+            - name: "http"
+              containerPort: 8000
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -173,6 +174,18 @@ spec:
           envFrom:
             - configMapRef:
                 name: auth-config
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            failureThreshold: 3
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            failureThreshold: 4
+            periodSeconds: 30
 status: {}
 ---
 apiVersion: v1

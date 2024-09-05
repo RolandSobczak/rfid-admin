@@ -5,47 +5,65 @@ metadata:
   labels:
     app: rabbit
   name: rabbit
-namespace: "%NAMESPACE%"
+  namespace: "%NAMESPACE%"
 spec:
-replicas: 1
-selector:
-  matchLabels:
-    app: rabbit
-strategy: {}
-template:
-  metadata:
-    creationTimestamp: null
-    labels:
+  replicas: 1
+  selector:
+    matchLabels:
       app: rabbit
-  spec:
-    containers:
-      - image: rabbitmq:3.13.6-management
-        name: rabbit
-        resources: {}
-        env:
-          - name: RABBIT_USER
-            valueFrom:
-              secretKeyRef:
-                name: rabbit
-                key: RABBIT_USER
-          - name: RABBIT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: rabbit
-                key: RABBIT_PASSWORD
-        ports:
-          - containerPort: 5432
-          - containerPort: 15672
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: rabbit
+    spec:
+      containers:
+        - image: rabbitmq:3.13.6-management
+          name: rabbit
+          resources: {}
+          env:
+            - name: RABBIT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBIT_USER
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit
+                  key: RABBIT_PASSWORD
+          ports:
+            - containerPort: 5432
+              name: "amqp"
+            - containerPort: 15672
+              name: "http"
+          livenessProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - "-q"
+                - ping
+            failureThreshold: 1
+            periodSeconds: 10
+          startupProbe:
+            exec:
+              command:
+                - rabbitmq-diagnostics
+                - "-q"
+                - ping
+            failureThreshold: 30
+            periodSeconds: 10
 status: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-creationTimestamp: null
-labels:
-  app: rabbit
-name: mq
-namespace: "%NAMESPACE%"
+  creationTimestamp: null
+  labels:
+    app: rabbit
+  name: mq
+  namespace: "%NAMESPACE%"
 spec:
   ports:
     - port: 5672
@@ -67,7 +85,7 @@ metadata:
   namespace: "%NAMESPACE%"
 spec:
   ports:
-    - port:
+    - port: 15672
       protocol: TCP
       targetPort: 15672
   selector:

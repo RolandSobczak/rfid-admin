@@ -11,13 +11,16 @@ alias k=kubectl
 
 NODE='pop-os'
 
-#k create namespace "$NAMESPACE"
+k create namespace "$NAMESPACE"
 
 k create secret generic -n "$NAMESPACE" --from-env-file=env/postgres.env db
 k create secret generic -n "$NAMESPACE" --from-env-file=env/rabbit.env rabbit
 
 sed -e "s|%PG_VERSION%|${PG_VERSION}|g" \
     -e "s|%DB_DIR%|${DB_DIR}|g" \
+    -e "s|%STORAGE_CLASS%|${POSTGRES_STORAGE_CLASS}|g" \
+    -e "s|%VOLUME_NAME%|${POSTGRES_VOLUME_NAME}|g" \
+    -e "s|%STORAGE_SIZE%|${POSTGRES_STORAGE_SIZE}|g" \
     -e "s|%NAMESPACE%|${NAMESPACE}|g" \
     -e "s|%NODE%|${NODE}|g" \
     k8s/db.yml > "$BUILD_DIR/db.yml"
@@ -32,7 +35,12 @@ sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
 
 sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
     -e "s|%NAMESPACE%|${NAMESPACE}|g" \
+    -e "s|%STORAGE_CLASS%|${BACKUP_STORAGE_CLASS}|g" \
+    -e "s|%VOLUME_NAME%|${BACKUP_VOLUME_NAME}|g" \
+    -e "s|%STORAGE_SIZE%|${BACKUP_STORAGE_SIZE}|g" \
     -e "s|%NODE%|${NODE}|g" \
+    -e "s|%DOMAIN%|${DOMAIN}|g" \
+    -e "s|%ROUTING%|${ROUTING}|g" \
     k8s/admin.yml > "$BUILD_DIR/admin.yml"
 
 sed -e "s|%NAMESPACE%|${NAMESPACE}|g" \
@@ -57,7 +65,7 @@ k apply -f "$BUILD_DIR/admin.yml"
 k apply -f "$BUILD_DIR/admin-front.yml"
 k apply -f "$BUILD_DIR/tenant-conf.yml"
 
-if [ "$ROUTING" = "domain" ]; then
+if [ "$ROUTING" = "DOMAIN"  ]; then
   sed -e "s|%DOMAIN%|${DOMAIN}|g" \
       -e "s|%NAMESPACE%|${NAMESPACE}|g" \
       k8s/ingress-domain.yml > "$BUILD_DIR/ingress-domain.yml"

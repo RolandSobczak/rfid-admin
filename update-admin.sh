@@ -33,6 +33,6 @@ docker build -t $rfid_worker -t $rfid_worker_latest -f docker/worker/Dockerfile 
 docker push $rfid_worker
 docker push $rfid_worker_latest
 
-kubectl set image deployments --namespace=rfid-main --selector="app=admin-api" admin-api=$rfid_admin
+kubectl set image deployments --namespace=rfid-dev --selector="app=admin-api" admin-api=$rfid_admin
 
 cd -
