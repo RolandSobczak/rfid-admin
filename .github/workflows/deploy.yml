@@ -37,4 +37,4 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         with:
-          args: set image deployments --namespace=rfid-dev --selector="app=admin-api" admin-api=registry.rolandsobczak.com/rfidio/rfid-admin-api${{ github.sha }}
+          args: set image deployments --namespace=${{ vars.NAMESPACE }} --selector="app=admin-api" admin-api=${{ vars.DOCKER_REPO }}/rfid-admin-api${{ github.sha }}
