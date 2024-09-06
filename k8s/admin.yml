@@ -91,8 +91,10 @@ spec:
         - name: bak-data
           persistentVolumeClaim:
             claimName: rfid-bak
+      imagePullSecrets:
+        - name: regcred
       containers:
-        - image: localhost:32000/rfidio-admin:latest 
+        - image: "%REGISTRY%/rfid-admin-api:latest"
           imagePullPolicy: Always
           name: admin-api
           resources: {}

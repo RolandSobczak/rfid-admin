@@ -74,7 +74,7 @@ spec:
         app: tenant
     spec:
       containers:
-        - image: localhost:32000/rfidio-tenant:latest
+        - image: "%REGISTRY%/rfidio-tenant:latest"
           imagePullPolicy: Always
           name: tenant
           resources: {}

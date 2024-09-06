@@ -7,6 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: "%INGRESS_CLASS%"
   rules:
     - http:
         paths:
@@ -27,6 +28,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: "%INGRESS_CLASS%"
   rules:
     - http:
         paths:
@@ -46,6 +48,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: "%INGRESS_CLASS%"
   rules:
     - http:
         paths:
@@ -66,6 +69,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: "%INGRESS_CLASS%"
   rules:
     - http:
         paths:
@@ -84,6 +88,7 @@ metadata:
   namespace: "%NAMESPACE%"
   annotations:
 spec:
+  ingressClassName: "%INGRESS_CLASS%"
   rules:
     - http:
         paths:
