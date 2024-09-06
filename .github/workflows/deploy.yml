@@ -1,10 +1,7 @@
 name: ci
 
-on:
-  push:
-    branches:
-      - main
-      - develop
+name: Deploy admin API
+on: [push]
 
 jobs:
   docker:
@@ -37,3 +34,12 @@ jobs:
           tags: |
             ${{ vars.DOCKER_REPO }}/rfid-admin-api:latest
             ${{ vars.DOCKER_REPO }}/rfid-admin-api:${{ github.sha }}
+      - 
+        name: kube update
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_HOST: ${{ secrets.KUBE_HOST }}
+          KUBE_CERTIFICATE: ${{ secrets.KUBE_CERTIFICATE }}
+          KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
+        with:
+          args: set image deployments --namespace=rfid-dev --selector="app=admin-api" admin-api=registry.rolandsobczak.com/rfidio/rfid-admin-api${{ github.sha }}
