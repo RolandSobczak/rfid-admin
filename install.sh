@@ -79,14 +79,12 @@ if [ "$ROUTING" = "DOMAIN"  ]; then
   sed -e "s|%DOMAIN%|${DOMAIN}|g" \
       -e "s|%NAMESPACE%|${NAMESPACE}|g" \
       -e "s|%INGRESS_CLASS%|${INGRESS_CLASS}|g" \
-      -e "s|%REQUESTED_IP%|${REQUESTED_IP}|g" \
       k8s/ingress-domain.yml > "$BUILD_DIR/ingress-domain.yml"
 
   k apply -f "$BUILD_DIR/ingress-domain.yml"
 else
   sed -e "s|%NAMESPACE%|${NAMESPACE}|g" \
       -e "s|%INGRESS_CLASS%|${INGRESS_CLASS}|g" \
-      -e "s|%REQUESTED_IP%|${REQUESTED_IP}|g" \
       k8s/ingress-path.yml > "$BUILD_DIR/ingress-path.yml"
 
   k apply -f "$BUILD_DIR/ingress-path.yml"
