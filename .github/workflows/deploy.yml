@@ -1,6 +1,4 @@
-name: ci
-
-name: Deploy admin API
+name: "Deploy admin API"
 on: [push]
 
 jobs:
