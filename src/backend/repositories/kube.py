@@ -23,7 +23,7 @@ class KubeAPIService(BaseService):
     def _create_deployment(self, apps_v1_api, tenant: TenantProfileSchema):
         container = client.V1Container(
             name="tenant",
-            image="localhost:32000/rfidio-tenant:latest",
+            image=self._settings.DOCKER_REPO + "/rfidio-tenant:latest",
             image_pull_policy="Always",
             ports=[client.V1ContainerPort(container_port=8000)],
             env_from=[
@@ -96,11 +96,21 @@ class KubeAPIService(BaseService):
                 ),
             ],
         )
+
+        image_pull_secrets = []
+        if self._settings.IMAGE_PULL_SECRET is not None:
+            image_pull_secrets = [
+                client.V1LocalObjectReference(name=self._settings.IMAGE_PULL_SECRET)
+            ]
+
         template = client.V1PodTemplateSpec(
             metadata=client.V1ObjectMeta(
                 labels={"app": "tenant", "tenant": tenant.slug}
             ),
-            spec=client.V1PodSpec(containers=[container]),
+            spec=client.V1PodSpec(
+                containers=[container],
+                image_pull_secrets=image_pull_secrets,
+            ),
         )
         spec = client.V1DeploymentSpec(
             replicas=1,

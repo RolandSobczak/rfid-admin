@@ -16,15 +16,20 @@ class Routing(Enum):
 class Settings(BaseSettings):
     AUTH_API_HOST: str
     TENANT_API_TEMPLATE: str
+
     BACKUP_DIR: str
     DBHOST: str
     NAMESPACE = "rfid-main"
     INSIDE_CLUSTER: bool
     INSIDE_DOCKER: bool
-    RABBIT_CONFIG: dict
-    POSTGRES_CONFIG: dict
     ROUTING: Routing
     DOMAIN: Optional[str]
+
+    DOCKER_REPO: str
+    IMAGE_PULL_SECRET: Optional[str] = None
+
+    RABBIT_CONFIG: dict
+    POSTGRES_CONFIG: dict
 
     def _load_data(self):
         self.INSIDE_DOCKER = env.bool("INSIDE_DOCKER", default=True)
@@ -34,6 +39,8 @@ class Settings(BaseSettings):
         self.BACKUP_DIR = env("BACKUP_DIR")
         self.ROUTING = env.enum("ROUTING", type=Routing, ignore_case=True)
         self.DOMAIN = env("DOMAIN", None)
+        self.DOCKER_REPO = env("DOCKER_REPO")
+        self.IMAGE_PULL_SECRET = env("IMAGE_PULL_SECRET", None)
 
         self.AUTH_API_HOST = env("AUTH_API_HOST")
         self.PUBLIC_KEY = env("PUBLIC_KEY")
