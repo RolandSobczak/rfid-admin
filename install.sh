@@ -66,6 +66,9 @@ sed -e "s|%NAMESPACE%|${NAMESPACE}|g" \
     -e "s|%REGISTRY%|${REGISTRY}|g" \
     k8s/tenant-conf.yml > "$BUILD_DIR/tenant-conf.yml"
 
+sed -e "s|%NAMESPACE%|${NAMESPACE}|g" \
+    k8s/sa.yml > "$BUILD_DIR/sa.yml"
+
 k apply -f "$BUILD_DIR/db.yml"
 k apply -f "$BUILD_DIR/rabbit.yml"
 k apply -f "$BUILD_DIR/auth.yml"
@@ -74,6 +77,7 @@ k apply -f "$BUILD_DIR/front.yml"
 k apply -f "$BUILD_DIR/admin.yml"
 k apply -f "$BUILD_DIR/admin-front.yml"
 k apply -f "$BUILD_DIR/tenant-conf.yml"
+k apply -f "$BUILD_DIR/sa.yml"
 
 if [ "$ROUTING" = "DOMAIN"  ]; then
   sed -e "s|%DOMAIN%|${DOMAIN}|g" \
