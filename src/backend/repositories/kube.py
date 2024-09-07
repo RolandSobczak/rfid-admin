@@ -25,27 +25,27 @@ class KubeAPIService(BaseService):
             name="tenant",
             image=self._settings.DOCKER_REPO + "/rfidio-tenant:latest",
             image_pull_policy="Always",
-            ports=[client.V1ContainerPort(container_port=8000)],
+            ports=[client.V1ContainerPort(container_port=8000, name="http")],
             env_from=[
                 client.V1EnvFromSource(
                     config_map_ref=client.V1ConfigMapEnvSource("tenant-config")
                 )
             ],
-            livenesse_probe=client.V1Probe(
-                http_get=client.V1GetAcction(
-                    path="/helthcheck",
-                    port="8000",
+            liveness_probe=client.V1Probe(
+                http_get=client.V1HTTPGetAction(
+                    path="/healthcheck",
+                    port="http",
                 ),
-                initial_second=5,
+                initial_delay_seconds=5,
                 period_seconds=10,
                 failure_threshold=3,
             ),
             startup_probe=client.V1Probe(
-                http_get=client.V1GetAcction(
-                    path="/helthcheck",
-                    port="8000",
+                http_get=client.V1HTTPGetAction(
+                    path="/healthcheck",
+                    port="http",
                 ),
-                initial_second=5,
+                initial_delay_seconds=5,
                 period_seconds=10,
                 failure_threshold=3,
             ),

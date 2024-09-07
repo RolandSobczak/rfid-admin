@@ -30,6 +30,7 @@ class Settings(BaseSettings):
 
     RABBIT_CONFIG: dict
     POSTGRES_CONFIG: dict
+    POSTGRES_TIMEOUT: int
 
     def _load_data(self):
         self.INSIDE_DOCKER = env.bool("INSIDE_DOCKER", default=True)
@@ -50,6 +51,7 @@ class Settings(BaseSettings):
         self.POSTGRES_PORT = env("POSTGRES_PORT")
         self.POSTGRES_USER = env("POSTGRES_USER")
         self.POSTGRES_PASSWORD = env("POSTGRES_PASSWORD")
+        self.POSTGRES_TIMEOUT = env.int("POSTGRES_TIMEOUT", 500)
 
         self.DBHOST = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/"
         self.NAMESPACE = env("NAMESPACE")
