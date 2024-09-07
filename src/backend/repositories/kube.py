@@ -303,17 +303,18 @@ class KubeAPIService(BaseService):
             pods = self.get_deploy_pods(pods_selector)
             if len(pods) > 0:
                 containers_status = self.read_status(pods[0]["name"])
-                if len(containers_status) > 0:
+                containers_ready = False
+                if containers_status and len(containers_status) > 0:
                     containers_ready = all(
                         [container.get("ready") for container in containers_status]
                     )
-                    deployments.append(
-                        DeploymentSchema(
-                            name=deploy_name,
-                            ready=containers_ready,
-                            containers=pods[0]["containers"],
-                        )
+                deployments.append(
+                    DeploymentSchema(
+                        name=deploy_name,
+                        ready=containers_ready,
+                        containers=pods[0]["containers"],
                     )
+                )
 
         return deployments
 
