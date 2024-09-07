@@ -23,7 +23,7 @@ class KubeAPIService(BaseService):
     def _create_deployment(self, apps_v1_api, tenant: TenantProfileSchema):
         container = client.V1Container(
             name="tenant",
-            image=self._settings.DOCKER_REPO + "/rfidio-tenant:latest",
+            image=self._settings.REGISTRY + "/rfidio-tenant:latest",
             image_pull_policy="Always",
             ports=[client.V1ContainerPort(container_port=8000, name="http")],
             env_from=[

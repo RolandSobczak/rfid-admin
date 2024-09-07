@@ -40,7 +40,7 @@ class Settings(BaseSettings):
         self.BACKUP_DIR = env("BACKUP_DIR")
         self.ROUTING = env.enum("ROUTING", type=Routing, ignore_case=True)
         self.DOMAIN = env("DOMAIN", None)
-        self.DOCKER_REPO = env("DOCKER_REPO")
+        self.REGISTRY = env("REGISTRY")
         self.IMAGE_PULL_SECRET = env("IMAGE_PULL_SECRET", None)
 
         self.AUTH_API_HOST = env("AUTH_API_HOST")

@@ -31,7 +31,7 @@ data:
   # Logging
   LOG_LEVEL: DEBUG
 
-  #AUTH
+  # AUTH
   AUTH_API_HOST: http://auth:8000/v1
   TENANT_API_TEMPLATE: "http://{{ tenant_slug }}:8000"
 
@@ -49,9 +49,13 @@ data:
   # PATH
   ROOT_PATH: /admin-api
 
-  #MQ
+  # MQ
   RABBIT_HOST: mq
   RABBIT_PORT: "5672"
+
+  # REPO
+  REGISTRY: "%REGISTRY%"
+  IMAGE_PULL_SECRET: "%IMAGE_PULL_SECRET%"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
