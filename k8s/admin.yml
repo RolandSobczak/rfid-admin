@@ -107,7 +107,7 @@ spec:
                 name: admin-config
           env:
             - name: NAMESPACE 
-              value: "rfid-main"
+              value: "%NAMESPACE%"
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

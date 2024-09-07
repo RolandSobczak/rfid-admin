@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     BACKUP_DIR: str
     DBHOST: str
-    NAMESPACE = "rfid-main"
+    NAMESPACE: str
     INSIDE_CLUSTER: bool
     INSIDE_DOCKER: bool
     ROUTING: Routing
