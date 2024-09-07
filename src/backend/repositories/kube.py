@@ -23,29 +23,29 @@ class KubeAPIService(BaseService):
     def _create_deployment(self, apps_v1_api, tenant: TenantProfileSchema):
         container = client.V1Container(
             name="tenant",
-            image="localhost:32000/rfidio-tenant:latest",
+            image=self._settings.DOCKER_REPO + "/rfidio-tenant:latest",
             image_pull_policy="Always",
-            ports=[client.V1ContainerPort(container_port=8000)],
+            ports=[client.V1ContainerPort(container_port=8000, name="http")],
             env_from=[
                 client.V1EnvFromSource(
                     config_map_ref=client.V1ConfigMapEnvSource("tenant-config")
                 )
             ],
-            livenesse_probe=client.V1Probe(
-                http_get=client.V1GetAcction(
-                    path="/helthcheck",
-                    port="8000",
+            liveness_probe=client.V1Probe(
+                http_get=client.V1HTTPGetAction(
+                    path="/healthcheck",
+                    port="http",
                 ),
-                initial_second=5,
+                initial_delay_seconds=5,
                 period_seconds=10,
                 failure_threshold=3,
             ),
             startup_probe=client.V1Probe(
-                http_get=client.V1GetAcction(
-                    path="/helthcheck",
-                    port="8000",
+                http_get=client.V1HTTPGetAction(
+                    path="/healthcheck",
+                    port="http",
                 ),
-                initial_second=5,
+                initial_delay_seconds=5,
                 period_seconds=10,
                 failure_threshold=3,
             ),
@@ -96,11 +96,21 @@ class KubeAPIService(BaseService):
                 ),
             ],
         )
+
+        image_pull_secrets = []
+        if self._settings.IMAGE_PULL_SECRET is not None:
+            image_pull_secrets = [
+                client.V1LocalObjectReference(name=self._settings.IMAGE_PULL_SECRET)
+            ]
+
         template = client.V1PodTemplateSpec(
             metadata=client.V1ObjectMeta(
                 labels={"app": "tenant", "tenant": tenant.slug}
             ),
-            spec=client.V1PodSpec(containers=[container]),
+            spec=client.V1PodSpec(
+                containers=[container],
+                image_pull_secrets=image_pull_secrets,
+            ),
         )
         spec = client.V1DeploymentSpec(
             replicas=1,

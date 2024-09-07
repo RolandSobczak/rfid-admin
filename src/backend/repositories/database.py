@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from sqlalchemy import create_engine, text
 from backend.schemas.tenants import TenantSchema, OwnerProfile
-from sqlalchemy_utils.functions import database_exists, create_database, drop_database
+from backend.utils import database_exists, create_database, drop_database
 from sqlalchemy.exc import SQLAlchemyError
 
 from .base import BaseService
@@ -20,8 +20,14 @@ class DBService(BaseService):
     def create_database(self, db_name: str):
         target_conn_str = self._settings.DBHOST + db_name
 
-        if not database_exists(target_conn_str):
-            create_database(target_conn_str)
+        if not database_exists(
+            target_conn_str,
+            connect_timeout=self._settings.POSTGRES_TIMEOUT,
+        ):
+            create_database(
+                target_conn_str,
+                connect_timeout=self._settings.POSTGRES_TIMEOUT,
+            )
 
     def destroy_tenant(self, user_id: int):
         engine = create_engine(self._settings.DBHOST + "auth", echo=True)
@@ -44,8 +50,14 @@ class DBService(BaseService):
     #     pass
 
     def drop_database(self, db_name: str):
-        if database_exists(self._settings.DBHOST + db_name):
-            drop_database(self._settings.DBHOST + db_name)
+        if database_exists(
+            self._settings.DBHOST + db_name,
+            connect_timeout=self._settings.POSTGRES_TIMEOUT,
+        ):
+            drop_database(
+                self._settings.DBHOST + db_name,
+                connect_timeout=self._settings.POSTGRES_TIMEOUT,
+            )
 
     def get_db_list(self) -> List[str]:
         engine = create_engine(self._settings.DBHOST, echo=True)

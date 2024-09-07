@@ -20,7 +20,7 @@ services:
       - ./backups:/var/backup/
       - ./src/backend:/src/backend
       - ./src/shared:/src/shared
-
+      - ~/.kube/config:/root/.kube/config
     env_file:
       - "env/backend.env"
     ports:
