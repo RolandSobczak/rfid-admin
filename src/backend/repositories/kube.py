@@ -2,7 +2,6 @@ import uuid
 import datetime
 from typing import List
 from kubernetes import client, config
-from kubernetes.client.exceptions import ApiException
 
 from backend.schemas.users import UserCreationModel, TenantProfileSchema
 from backend.schemas.tenants import TenantSchema
@@ -222,14 +221,38 @@ class KubeAPIService(BaseService):
         self._create_ingress(networking_v1_api, tenant)
 
     def destroy_tenant(self, tenant: TenantSchema):
-        k8s_apps_v1 = client.AppsV1Api()
-        k8s_apps_v1.delete_namespaced_deployment(tenant.slug, self._settings.NAMESPACE)
-        core_v1_api = client.CoreV1Api()
-        core_v1_api.delete_namespaced_service(tenant.slug, self._settings.NAMESPACE)
-        networking_v1_api = client.NetworkingV1Api()
-        networking_v1_api.delete_namespaced_ingress(
-            tenant.slug, self._settings.NAMESPACE
-        )
+        try:
+            k8s_apps_v1 = client.AppsV1Api()
+            k8s_apps_v1.delete_namespaced_deployment(tenant.slug, self._settings.NAMESPACE)
+        except client.rest.ApiException as e:
+            if e.status == 404:
+                print(f"Deployment for tenant doesn't exist. "
+                      "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]")
+            else:
+                raise e
+
+        try:
+            core_v1_api = client.CoreV1Api()
+            core_v1_api.delete_namespaced_service(tenant.slug, self._settings.NAMESPACE)
+        except client.rest.ApiException as e:
+            if e.status == 404:
+                print(f"Service for tenant doesn't exist. "
+                      "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]")
+            else:
+                raise e
+
+        try:
+            networking_v1_api = client.NetworkingV1Api()
+            networking_v1_api.delete_namespaced_ingress(
+                tenant.slug, self._settings.NAMESPACE
+            )
+        except client.rest.ApiException as e:
+            if e.status == 404:
+                print(f"Ingress for tenant doesn't exist. "
+                      "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]")
+            else:
+                raise e
+
 
     def list_raw_deployments(self) -> List[dict]:
         api_instance = client.AppsV1Api()
