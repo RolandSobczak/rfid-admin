@@ -277,7 +277,7 @@ class KubeAPIService(BaseService):
                 }
                 for container in api_response.status.container_statuses
             ]
-        except ApiException as e:
+        except client.rest.ApiException as e:
             print(
                 "Exception when calling CoreV1Api->read_namespaced_pod_status: %s\n" % e
             )
@@ -595,6 +595,6 @@ class KubeAPIService(BaseService):
         except:
             return False
 
-        # except ApiException as e:
+        # except client.rest.ApiException as e:
         # print(e)
         # return False
