@@ -35,8 +35,18 @@ jobs:
           tags: |
             ${{ vars.DOCKER_REPO }}/rfid-admin-api:latest
             ${{ vars.DOCKER_REPO }}/rfid-admin-api:${{ github.sha }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/worker/Dockerfile
+          push: true
+          tags: |
+            ${{ vars.DOCKER_REPO }}/rfid-backup-worker:latest
+            ${{ vars.DOCKER_REPO }}/rfid-backup-worker:${{ github.sha }}
       - 
-        name: kube update
+        name: kube admin update
         uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
