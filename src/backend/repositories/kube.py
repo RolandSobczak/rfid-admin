@@ -288,9 +288,12 @@ class KubeAPIService(BaseService):
                 for container in api_response.status.container_statuses
             ]
         except client.rest.ApiException as e:
-            print(
-                "Exception when calling CoreV1Api->read_namespaced_pod_status: %s\n" % e
-            )
+            if e.status == 404:
+                print(
+                    "Exception when calling CoreV1Api->read_namespaced_pod_status: %s\n" % e
+                )
+            else:
+                raise e
 
     def load_logs(self, pod_name: str):
         api_instance = client.CoreV1Api()

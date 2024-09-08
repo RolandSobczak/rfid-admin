@@ -40,7 +40,6 @@ class TenantService(BaseService):
         db_tenants = self._db_serv.get_tenants_list()
         for tenant in db_tenants:
             is_healthy = await self.check_healthy(tenant)
-            # print(is_healthy)
             tenant.healthy = is_healthy
         return db_tenants
 
