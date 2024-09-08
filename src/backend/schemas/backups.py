@@ -4,9 +4,9 @@ import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
-CRON_JOB_REGEX = re.compile(
-    r"^(\*|[0-5]?\d)( \*| [01]?\d|2[0-3])( \*| [01]?\d|3[01])( \*| [0-9]|1[0-2])( \*| [0-6])$"
-)
+CRON_JOB_REGEX = r"^(\*|([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])|\*\/([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])) (\*|([0-9]|1[0-9]|2[0-3])|\*\/([0-9]|1[0-9]|2[0-3])) (\*|([1-9]|1[0-9]|2[0-9]|3[0-1])|\*\/([1-9]|1[0-9]|2[0-9]|3[0-1])) (\*|([1-9]|1[0-2])|\*\/([1-9]|1[0-2])) (\*|([0-6])|\*\/([0-6]))$"
+
+JOB_NAME_REGEX = r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
 
 
 class BackupSchema(BaseModel):
@@ -20,7 +20,7 @@ class BackupCreationSchema(BaseModel):
 
 
 class BackupSchedulerCreationSchema(BaseModel):
-    scheduler_name: str = Field(min_length=3, max_length=32)
+    scheduler_name: str = Field(min_length=3, max_length=32, pattern=JOB_NAME_REGEX)
     app: str
     schedule: str = Field(pattern=CRON_JOB_REGEX)
 
