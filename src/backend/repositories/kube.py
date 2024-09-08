@@ -374,10 +374,14 @@ class KubeAPIService(BaseService):
                 "db": schema.app,
             },
         )
+        image_pull_secrets = [
+            client.V1LocalObjectReference(name=self._settings.IMAGE_PULL_SECRET)
+        ]
         template = client.V1PodTemplateSpec(
             metadata=metadata,
             spec=client.V1PodSpec(
                 restart_policy="Never",
+                image_pull_secrets=image_pull_secrets,
                 volumes=[
                     client.V1Volume(
                         name="bak-pvc",
@@ -389,7 +393,7 @@ class KubeAPIService(BaseService):
                 containers=[
                     client.V1Container(
                         name="sender",
-                        image="localhost:32000/rfidio-admin-worker:latest",
+                        image=self._settings.REGISTRY + "/rfid-backup-worker:latest",
                         image_pull_policy="Always",
                         env_from=[
                             client.V1EnvFromSource(
@@ -519,10 +523,14 @@ class KubeAPIService(BaseService):
                 "db": db_name,
             },
         )
+        image_pull_secrets = [
+            client.V1LocalObjectReference(name=self._settings.IMAGE_PULL_SECRET)
+        ]
         template = client.V1PodTemplateSpec(
             metadata=metadata,
             spec=client.V1PodSpec(
                 restart_policy="Never",
+                image_pull_secrets=image_pull_secrets,
                 volumes=[
                     client.V1Volume(
                         name="bak-pvc",
@@ -534,7 +542,7 @@ class KubeAPIService(BaseService):
                 containers=[
                     client.V1Container(
                         name="sender",
-                        image="localhost:32000/rfidio-admin-worker:latest",
+                        image=self._settings.REGISTRY + "/rfid-backup-worker:latest",
                         image_pull_policy="Always",
                         env_from=[
                             client.V1EnvFromSource(
@@ -580,7 +588,8 @@ class KubeAPIService(BaseService):
             backoff_limit=3, completions=1, parallelism=1, template=template
         )
         api_res = api_instance.create_namespaced_job(
-            namespace="rfid-dev", body=client.V1Job(metadata=metadata, spec=spec)
+            namespace=self._settings.NAMESPACE,
+            body=client.V1Job(metadata=metadata, spec=spec),
         )
 
     def check_scheduler_exists(self, scheduler_name: str) -> bool:
