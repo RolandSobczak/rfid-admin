@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     DOCKER_REPO: str
     IMAGE_PULL_SECRET: Optional[str] = None
+    INGRESS_CLASS: str
 
     RABBIT_CONFIG: dict
     POSTGRES_CONFIG: dict
@@ -42,6 +43,7 @@ class Settings(BaseSettings):
         self.DOMAIN = env("DOMAIN", None)
         self.REGISTRY = env("REGISTRY")
         self.IMAGE_PULL_SECRET = env("IMAGE_PULL_SECRET", None)
+        self.INGRESS_CLASS = env("INGRESS_CLASS")
 
         self.AUTH_API_HOST = env("AUTH_API_HOST")
         self.PUBLIC_KEY = env("PUBLIC_KEY")

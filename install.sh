@@ -49,6 +49,7 @@ sed -e "s|%BACKUP_DIR%|${BACKUP_DIR}|g" \
     -e "s|%ROUTING%|${ROUTING}|g" \
     -e "s|%REGISTRY%|${REGISTRY}|g" \
     -e "s|%IMAGE_PULL_SECRET%|${IMAGE_PULL_SECRET}|g" \
+    -e "s|%INGRESS_CLASS%|${INGRESS_CLASS}|g" \
     k8s/admin.yml > "$BUILD_DIR/admin.yml"
 
 sed -e "s|%NAMESPACE%|${NAMESPACE}|g" \

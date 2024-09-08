@@ -22,7 +22,8 @@ data:
 
   BACKUP_DIR: /var/backup
   ROUTING: DOMAIN
-  DOMAIN: "server.local"
+  DOMAIN: "%DOMAIN%"
+  INGRESS_CLASS: "%INGRESS_CLASS%"
 
   # ENV
   ENV_TYPE: dev

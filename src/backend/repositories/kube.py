@@ -206,7 +206,10 @@ class KubeAPIService(BaseService):
                     "nginx.ingress.kubernetes.io/use-regex": "true",
                 },
             ),
-            spec=client.V1IngressSpec(rules=[rule]),
+            spec=client.V1IngressSpec(
+                rules=[rule],
+                ingress_class_name=self._settings.INGRESS_CLASS,
+            ),
         )
         networking_v1_api.create_namespaced_ingress(
             namespace=self._settings.NAMESPACE, body=body
@@ -223,11 +226,15 @@ class KubeAPIService(BaseService):
     def destroy_tenant(self, tenant: TenantSchema):
         try:
             k8s_apps_v1 = client.AppsV1Api()
-            k8s_apps_v1.delete_namespaced_deployment(tenant.slug, self._settings.NAMESPACE)
+            k8s_apps_v1.delete_namespaced_deployment(
+                tenant.slug, self._settings.NAMESPACE
+            )
         except client.rest.ApiException as e:
             if e.status == 404:
-                print(f"Deployment for tenant doesn't exist. "
-                      "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]")
+                print(
+                    f"Deployment for tenant doesn't exist. "
+                    "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]"
+                )
             else:
                 raise e
 
@@ -236,8 +243,10 @@ class KubeAPIService(BaseService):
             core_v1_api.delete_namespaced_service(tenant.slug, self._settings.NAMESPACE)
         except client.rest.ApiException as e:
             if e.status == 404:
-                print(f"Service for tenant doesn't exist. "
-                      "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]")
+                print(
+                    f"Service for tenant doesn't exist. "
+                    "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]"
+                )
             else:
                 raise e
 
@@ -248,11 +257,12 @@ class KubeAPIService(BaseService):
             )
         except client.rest.ApiException as e:
             if e.status == 404:
-                print(f"Ingress for tenant doesn't exist. "
-                      "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]")
+                print(
+                    f"Ingress for tenant doesn't exist. "
+                    "[tenant_slug={tenant.slug}, tenant_id={tenant.id}, namespace={sefl._settings}]"
+                )
             else:
                 raise e
-
 
     def list_raw_deployments(self) -> List[dict]:
         api_instance = client.AppsV1Api()
